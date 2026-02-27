@@ -1,35 +1,83 @@
 'use client'
 
-import React from 'react'
-import { Card, Row, Col, Statistic, Typography, Progress, List, Button, Tag, Space } from 'antd'
+import React, { useState, useEffect, useCallback } from 'react'
+import { Card, Row, Col, Statistic, Typography, Progress, List, Button, Tag, Space, Spin } from 'antd'
 import {
   TeamOutlined,
   FileTextOutlined,
   RiseOutlined,
   NotificationOutlined,
+  UserOutlined,
+  SendOutlined,
 } from '@ant-design/icons'
 import DashboardLayout from '@/components/layout/DashboardLayout'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import { EmploymentChart } from '@/components/charts'
 
 const { Title, Text } = Typography
 
-const majorData = [
-  { name: '计算机科学与技术', employment: 92, total: 180 },
-  { name: '软件工程', employment: 95, total: 150 },
-  { name: '电子信息工程', employment: 88, total: 120 },
-  { name: '机械工程', employment: 82, total: 100 },
-  { name: '工商管理', employment: 78, total: 90 },
-]
-
-const recentPushes = [
-  { id: 1, job: '前端开发工程师', company: '小米武汉', target: '计算机学院', count: 45 },
-  { id: 2, job: '产品经理', company: '斗鱼直播', target: '商学院', count: 32 },
-  { id: 3, job: '算法工程师', company: '字节跳动', target: '人工智能学院', count: 28 },
-]
-
 export default function SchoolDashboard() {
+  const { data: session, status } = useSession()
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
+  const [stats, setStats] = useState<any>(null)
+
+  const schoolId = (session?.user as any)?.schoolManagedId
+
+  const fetchStats = useCallback(async () => {
+    if (!schoolId) return
+
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/statistics/school?schoolId=${schoolId}`)
+      const data = await res.json()
+
+      if (data.success) {
+        setStats(data.data.employmentStats)
+      }
+    } catch (error) {
+      console.error('Fetch stats error:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [schoolId])
+
+  useEffect(() => {
+    if (schoolId) {
+      fetchStats()
+    }
+  }, [schoolId, fetchStats])
+
+  if (status === 'loading') {
+    return (
+      <DashboardLayout role="school">
+        <div className="flex items-center justify-center h-64">
+          <Spin size="large" />
+        </div>
+      </DashboardLayout>
+    )
+  }
+
+  // 模拟数据用于展示
+  const majorData = stats?.topIndustries || [
+    { industry: '互联网/IT', count: 180 },
+    { industry: '智能制造', count: 150 },
+    { industry: '金融', count: 120 },
+  ]
+
+  const recentPushes = [
+    { id: 1, job: '前端开发工程师', company: '小米武汉', target: '计算机学院', count: 45 },
+    { id: 2, job: '产品经理', company: '斗鱼直播', target: '商学院', count: 32 },
+    { id: 3, job: '算法工程师', company: '字节跳动', target: '人工智能学院', count: 28 },
+  ]
+
   return (
     <DashboardLayout role="school">
-      <Title level={4} className="mb-6">就业数据看板</Title>
+      <div className="mb-6">
+        <Title level={4} className="!mb-2">就业数据看板</Title>
+        <Text type="secondary">学校就业数据概览</Text>
+      </div>
 
       {/* 统计卡片 */}
       <Row gutter={[16, 16]} className="mb-6">
@@ -78,28 +126,18 @@ export default function SchoolDashboard() {
       </Row>
 
       <Row gutter={[16, 16]}>
-        {/* 专业去向 */}
+        {/* 行业去向 */}
         <Col xs={24} lg={14}>
-          <Card title="各专业就业率">
+          <Card title="学生去向行业分布">
             <List
               dataSource={majorData}
-              renderItem={(item) => (
+              renderItem={(item: any) => (
                 <List.Item>
                   <div className="w-full">
                     <div className="flex justify-between mb-1">
-                      <Text>{item.name}</Text>
-                      <Space>
-                        <Text type="secondary">毕业生 {item.total} 人</Text>
-                        <Text strong className={item.employment >= 90 ? 'text-green-500' : ''}>
-                          {item.employment}%
-                        </Text>
-                      </Space>
+                      <Text>{item.industry}</Text>
+                      <Text strong>{item.count} 人</Text>
                     </div>
-                    <Progress
-                      percent={item.employment}
-                      showInfo={false}
-                      strokeColor={item.employment >= 90 ? '#52c41a' : '#1890ff'}
-                    />
                   </div>
                 </List.Item>
               )}
@@ -111,7 +149,16 @@ export default function SchoolDashboard() {
         <Col xs={24} lg={10}>
           <Card
             title="最近岗位推送"
-            extra={<Button type="primary" size="small" icon={<NotificationOutlined />}>推送岗位</Button>}
+            extra={
+              <Button
+                type="primary"
+                size="small"
+                icon={<NotificationOutlined />}
+                onClick={() => router.push('/school/push')}
+              >
+                推送岗位
+              </Button>
+            }
           >
             <List
               dataSource={recentPushes}
@@ -137,6 +184,32 @@ export default function SchoolDashboard() {
           </Card>
         </Col>
       </Row>
+
+      {/* 快捷入口 */}
+      <Card className="mt-4" title="快捷入口">
+        <Row gutter={[16, 16]}>
+          <Col xs={24} sm={8}>
+            <Card
+              hoverable
+              className="text-center"
+              onClick={() => router.push('/school/students')}
+            >
+              <UserOutlined style={{ fontSize: 32, color: '#1677FF' }} />
+              <div className="mt-2">学生管理</div>
+            </Card>
+          </Col>
+          <Col xs={24} sm={8}>
+            <Card
+              hoverable
+              className="text-center"
+              onClick={() => router.push('/school/push')}
+            >
+              <SendOutlined style={{ fontSize: 32, color: '#52C41A' }} />
+              <div className="mt-2">岗位推送</div>
+            </Card>
+          </Col>
+        </Row>
+      </Card>
     </DashboardLayout>
   )
 }
