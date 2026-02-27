@@ -153,6 +153,81 @@ export const CreateEnterpriseSchema = z.object({
   businessLicense: z.string().url().optional(),
 })
 
+// ==================== 学校相关 ====================
+
+export const SchoolQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(10),
+  verified: z.coerce.boolean().optional(),
+  keyword: z.string().optional(),
+})
+
+export const CreateSchoolSchema = z.object({
+  name: z.string().min(1, '学校名称不能为空').max(100),
+  type: z.string().min(1, '学校类型不能为空').max(50),
+  level: z.string().min(1, '学校层次不能为空').max(50),
+  address: z.string().max(200).optional(),
+  contactName: z.string().max(50).optional(),
+  contactPhone: z.string().optional(),
+  logo: z.string().url().optional(),
+})
+
+export const UpdateSchoolSchema = CreateSchoolSchema.partial()
+
+export const VerifySchoolSchema = z.object({
+  verified: z.boolean(),
+})
+
+// ==================== 用户管理相关 ====================
+
+export const UserQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(10),
+  role: z.enum(['STUDENT', 'ENTERPRISE', 'SCHOOL', 'GOVERNMENT', 'ADMIN']).optional(),
+  status: z.enum(['ACTIVE', 'INACTIVE', 'PENDING', 'REJECTED']).optional(),
+  schoolId: z.string().optional(),
+  enterpriseId: z.string().optional(),
+  keyword: z.string().optional(),
+})
+
+export const UpdateUserStatusSchema = z.object({
+  status: z.enum(['ACTIVE', 'INACTIVE', 'PENDING', 'REJECTED']),
+})
+
+// ==================== 统计相关 ====================
+
+export const DateRangeSchema = z.object({
+  startDate: z.coerce.date().optional(),
+  endDate: z.coerce.date().optional(),
+})
+
+export const TrendQuerySchema = z.object({
+  months: z.coerce.number().int().min(1).max(24).default(6),
+})
+
+// ==================== 岗位推送相关 ====================
+
+export const CreateJobPushSchema = z.object({
+  jobId: z.string(),
+  schoolId: z.string(),
+  targetMajors: z.array(z.string()).default([]),
+})
+
+export const JobPushQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(10),
+  schoolId: z.string().optional(),
+})
+
+// ==================== 数据导出相关 ====================
+
+export const ExportQuerySchema = z.object({
+  type: z.enum(['users', 'enterprises', 'schools', 'applications', 'jobs', 'policies']),
+  format: z.enum(['csv', 'xlsx']).default('xlsx'),
+  startDate: z.coerce.date().optional(),
+  endDate: z.coerce.date().optional(),
+})
+
 // ==================== API 响应 ====================
 
 export interface ApiResponse<T> {
