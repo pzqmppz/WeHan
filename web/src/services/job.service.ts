@@ -6,6 +6,7 @@
 import { jobRepository, JobFilter, JobPagination } from '@/repositories/job.repository'
 import { CreateJobSchema, UpdateJobSchema, JobQuerySchema } from '@/lib/validators'
 import { z } from 'zod'
+import cuid from 'cuid'
 
 export type CreateJobInput = z.infer<typeof CreateJobSchema>
 export type UpdateJobInput = z.infer<typeof UpdateJobSchema>
@@ -59,10 +60,13 @@ export const jobService = {
     // 验证输入
     const validated = CreateJobSchema.parse(input)
 
+    const now = new Date()
+
     // 创建岗位
     const job = await jobRepository.create({
+      id: cuid(),
       title: validated.title,
-      enterprise: { connect: { id: validated.enterpriseId } },
+      Enterprise: { connect: { id: validated.enterpriseId } },
       industry: validated.industry,
       category: validated.category,
       salaryMin: validated.salaryMin,
@@ -78,6 +82,7 @@ export const jobService = {
       freshGraduate: validated.freshGraduate ?? true,
       headcount: validated.headcount ?? 1,
       status: 'DRAFT',
+      updatedAt: now,
     })
 
     return { data: job }

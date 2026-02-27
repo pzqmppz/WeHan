@@ -61,24 +61,7 @@ export default function JobsPage() {
   // 获取企业ID（从session中获取）
   const enterpriseId = (session?.user as any)?.enterpriseId
 
-  // 处理 session 加载状态
-  if (status === 'loading') {
-    return (
-      <DashboardLayout role="enterprise">
-        <div className="flex items-center justify-center h-64">
-          <Spin size="large" />
-        </div>
-      </DashboardLayout>
-    )
-  }
-
-  // 未登录
-  if (status === 'unauthenticated') {
-    router.push('/login?callbackUrl=/enterprise/jobs')
-    return null
-  }
-
-  // 加载岗位列表
+  // 加载岗位列表 - hooks 必须在早期返回之前调用
   const fetchJobs = useCallback(async (page = 1, pageSize = 10, filters = {}) => {
     if (!enterpriseId) return
 
@@ -117,6 +100,23 @@ export default function JobsPage() {
       fetchJobs()
     }
   }, [enterpriseId, fetchJobs])
+
+  // 处理 session 加载状态 - 早期返回必须在所有 hooks 之后
+  if (status === 'loading') {
+    return (
+      <DashboardLayout role="enterprise">
+        <div className="flex items-center justify-center h-64">
+          <Spin size="large" />
+        </div>
+      </DashboardLayout>
+    )
+  }
+
+  // 未登录
+  if (status === 'unauthenticated') {
+    router.push('/login?callbackUrl=/enterprise/jobs')
+    return null
+  }
 
   // 搜索
   const handleSearch = (values: any) => {
@@ -284,6 +284,7 @@ export default function JobsPage() {
               onClick={() => router.push(`/enterprise/jobs/${record.id}/edit`)}
             />
           </Tooltip>
+          {/* 第三个按钮：发布/下架/重新发布 */}
           {record.status === 'DRAFT' && (
             <Tooltip title="发布">
               <Button
@@ -304,23 +305,32 @@ export default function JobsPage() {
               />
             </Tooltip>
           )}
-          {record.status === 'DRAFT' && (
-            <Popconfirm
-              title="确定要删除这个岗位吗？"
-              onConfirm={() => handleDelete(record.id)}
-              okText="确定"
-              cancelText="取消"
-            >
-              <Tooltip title="删除">
-                <Button
-                  type="text"
-                  size="small"
-                  danger
-                  icon={<DeleteOutlined />}
-                />
-              </Tooltip>
-            </Popconfirm>
+          {record.status === 'CLOSED' && (
+            <Tooltip title="重新发布">
+              <Button
+                type="text"
+                size="small"
+                icon={<CheckCircleOutlined />}
+                onClick={() => handlePublish(record.id)}
+              />
+            </Tooltip>
           )}
+          {/* 第四个按钮：删除 */}
+          <Popconfirm
+            title="确定要删除这个岗位吗？"
+            onConfirm={() => handleDelete(record.id)}
+            okText="确定"
+            cancelText="取消"
+          >
+            <Tooltip title="删除">
+              <Button
+                type="text"
+                size="small"
+                danger
+                icon={<DeleteOutlined />}
+              />
+            </Tooltip>
+          </Popconfirm>
         </Space>
       ),
     },

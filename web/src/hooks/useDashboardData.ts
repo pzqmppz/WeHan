@@ -43,8 +43,8 @@ export function useDashboardData<T extends DashboardRole>(
 
       try {
         // 开发阶段使用 Mock 数据
-        // TODO: 生产环境替换为真实 API 调用
-        const useMock = process.env.NODE_ENV === 'development' || true
+        // 生产环境调用真实 API
+        const useMock = false // 已切换到真实 API
 
         if (useMock) {
           let result: DashboardData[T]
@@ -71,10 +71,11 @@ export function useDashboardData<T extends DashboardRole>(
         } else {
           // 生产环境调用真实 API
           const response = await fetch(`/api/dashboard/${role}`)
-          if (!response.ok) {
-            throw new Error('Failed to fetch dashboard data')
-          }
           const json = await response.json()
+
+          if (!response.ok || !json.success) {
+            throw new Error(json.error || 'Failed to fetch dashboard data')
+          }
           setData(json.data)
         }
       } catch (err) {

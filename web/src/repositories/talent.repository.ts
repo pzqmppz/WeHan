@@ -63,7 +63,7 @@ export const talentRepository = {
   ): Promise<{ talents: TalentWithResume[]; total: number }> {
     // 构建基础查询条件
     const where: Prisma.ApplicationWhereInput = {
-      job: { enterpriseId: filter.enterpriseId },
+      Job: { enterpriseId: filter.enterpriseId },
     }
 
     // 状态筛选
@@ -75,9 +75,9 @@ export const talentRepository = {
     const applications = await prisma.application.findMany({
       where,
       include: {
-        user: {
+        User: {
           include: {
-            resume: {
+            Resume: {
               select: {
                 id: true,
                 phone: true,
@@ -92,13 +92,13 @@ export const talentRepository = {
             },
           },
         },
-        job: {
+        Job: {
           select: {
             id: true,
             title: true,
           },
         },
-        interview: {
+        Interview: {
           select: {
             id: true,
             totalScore: true,
@@ -118,12 +118,12 @@ export const talentRepository = {
       if (!userMap.has(userId)) {
         userMap.set(userId, {
           id: userId,
-          name: app.user.name,
-          email: app.user.email,
-          phone: app.user.resume?.phone || null,
-          major: app.user.major,
-          graduationYear: app.user.graduationYear,
-          resume: app.user.resume,
+          name: app.User.name,
+          email: app.User.email,
+          phone: app.User.Resume?.phone || null,
+          major: app.User.major,
+          graduationYear: app.User.graduationYear,
+          resume: app.User.Resume,
           applications: [],
         })
       }
@@ -135,8 +135,8 @@ export const talentRepository = {
         status: app.status,
         matchScore: app.matchScore,
         createdAt: app.createdAt,
-        job: app.job,
-        interview: app.interview,
+        job: app.Job,
+        interview: app.Interview,
       })
     }
 
@@ -186,10 +186,10 @@ export const talentRepository = {
     const applications = await prisma.application.findMany({
       where: {
         userId,
-        job: { enterpriseId },
+        Job: { enterpriseId },
       },
       include: {
-        job: {
+        Job: {
           select: {
             id: true,
             title: true,
@@ -198,7 +198,7 @@ export const talentRepository = {
             salaryMax: true,
           },
         },
-        interview: {
+        Interview: {
           select: {
             id: true,
             totalScore: true,
@@ -222,7 +222,7 @@ export const talentRepository = {
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: {
-        resume: true,
+        Resume: true,
       },
     })
 
@@ -234,17 +234,17 @@ export const talentRepository = {
       id: user.id,
       name: user.name,
       email: user.email,
-      phone: user.resume?.phone || null,
+      phone: user.Resume?.phone || null,
       major: user.major,
       graduationYear: user.graduationYear,
-      resume: user.resume,
+      resume: user.Resume,
       applications: applications.map(app => ({
         id: app.id,
         status: app.status,
         matchScore: app.matchScore,
         createdAt: app.createdAt,
-        job: app.job,
-        interview: app.interview,
+        job: app.Job,
+        interview: app.Interview,
       })),
     }
   },
@@ -264,7 +264,7 @@ export const talentRepository = {
     // 获取所有投递
     const applications = await prisma.application.findMany({
       where: {
-        job: { enterpriseId },
+        Job: { enterpriseId },
       },
       select: {
         userId: true,

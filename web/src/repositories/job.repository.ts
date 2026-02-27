@@ -20,7 +20,7 @@ export interface JobPagination {
 }
 
 export interface JobWithRelations extends Job {
-  enterprise: {
+  Enterprise: {
     id: string
     name: string
     logo: string | null
@@ -31,14 +31,23 @@ export interface JobWithRelations extends Job {
 export const jobRepository = {
   /**
    * 查找所有岗位（带分页和筛选）
+   * - 如果提供了 enterpriseId（企业查看自己的岗位），默认显示所有状态
+   * - 如果没有提供 enterpriseId（公开 API），默认只显示 PUBLISHED 状态
    */
   async findMany(
     filter: JobFilter,
     pagination: JobPagination
   ): Promise<{ jobs: JobWithRelations[]; total: number }> {
-    const where: Prisma.JobWhereInput = {
-      status: (filter.status as Prisma.EnumJobStatusFilter) || 'PUBLISHED',
+    const where: Prisma.JobWhereInput = {}
+
+    // 状态筛选：企业查看自己的岗位时显示所有状态，公开API只显示已发布
+    if (filter.status) {
+      where.status = filter.status as Prisma.EnumJobStatusFilter
+    } else if (!filter.enterpriseId) {
+      // 公开 API：只显示已发布的岗位
+      where.status = 'PUBLISHED'
     }
+    // 如果有 enterpriseId 且没有指定 status，则显示所有状态（企业自己查看）
 
     if (filter.industry) {
       where.industry = filter.industry
@@ -63,7 +72,7 @@ export const jobRepository = {
       prisma.job.findMany({
         where,
         include: {
-          enterprise: {
+          Enterprise: {
             select: {
               id: true,
               name: true,
@@ -89,7 +98,7 @@ export const jobRepository = {
     return prisma.job.findUnique({
       where: { id },
       include: {
-        enterprise: {
+        Enterprise: {
           select: {
             id: true,
             name: true,
@@ -152,7 +161,7 @@ export const jobRepository = {
     return prisma.job.findMany({
       where: { status: 'PUBLISHED' },
       include: {
-        enterprise: {
+        Enterprise: {
           select: {
             id: true,
             name: true,
@@ -161,11 +170,11 @@ export const jobRepository = {
           },
         },
         _count: {
-          select: { applications: true },
+          select: { Application: true },
         },
       },
       orderBy: {
-        applications: { _count: 'desc' },
+        Application: { _count: 'desc' },
       },
       take: limit,
     }) as Promise<JobWithRelations[]>

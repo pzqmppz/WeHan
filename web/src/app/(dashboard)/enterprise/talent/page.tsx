@@ -81,24 +81,7 @@ export default function TalentPoolPage() {
 
   const enterpriseId = (session?.user as any)?.enterpriseId
 
-  // 处理 session 加载状态
-  if (status === 'loading') {
-    return (
-      <DashboardLayout role="enterprise">
-        <div className="flex items-center justify-center h-64">
-          <Spin size="large" />
-        </div>
-      </DashboardLayout>
-    )
-  }
-
-  // 未登录
-  if (status === 'unauthenticated') {
-    router.push('/login?callbackUrl=/enterprise/talent')
-    return null
-  }
-
-  // 获取统计数据
+  // 获取统计数据 - hooks 必须在早期返回之前调用
   const fetchStatistics = useCallback(async () => {
     if (!enterpriseId) return
 
@@ -153,6 +136,23 @@ export default function TalentPoolPage() {
       fetchTalents()
     }
   }, [enterpriseId, fetchTalents, fetchStatistics])
+
+  // 处理 session 加载状态 - 早期返回必须在所有 hooks 之后
+  if (status === 'loading') {
+    return (
+      <DashboardLayout role="enterprise">
+        <div className="flex items-center justify-center h-64">
+          <Spin size="large" />
+        </div>
+      </DashboardLayout>
+    )
+  }
+
+  // 未登录
+  if (status === 'unauthenticated') {
+    router.push('/login?callbackUrl=/enterprise/talent')
+    return null
+  }
 
   // 搜索
   const handleSearch = (values: any) => {

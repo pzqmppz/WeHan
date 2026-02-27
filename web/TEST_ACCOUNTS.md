@@ -1,49 +1,24 @@
 # 测试账号
 
-> 运行 `npm run db:seed` 后可用的测试账号
+| 角色 | 邮箱 | 密码 |
+|------|------|------|
+| 企业HR | 
+hr1@enterprise.com
+enterprise123
+| 企业HR | hr2@enterprise.com | enterprise123 |
+| 企业HR | hr3@enterprise.com | enterprise123 |
+| 管理员 | admin@wehan.com | admin123 |
+| 政府 | gov@wuhan.gov.cn | government123 |
 
-## B 端管理后台
+## 说明
 
-| 角色 | 邮箱 | 密码 | 门户路径 |
-|-----|------|------|---------|
-| 系统管理员 | admin@wehan.com | admin123 | /admin |
-| 企业HR | hr1@enterprise.com | enterprise123 | /enterprise |
-| 企业HR | hr2@enterprise.com | enterprise123 | /enterprise |
-| 企业HR | hr3@enterprise.com | enterprise123 | /enterprise |
-| 学校管理员 | 武大@school.com | school123 | /school |
-| 学校管理员 | 华中科技@school.com | school123 | /school |
-| 学校管理员 | 武汉理工@school.com | school123 | /school |
-| 政府用户 | gov@wuhan.gov.cn | government123 | /government |
+- `hr1@enterprise.com` 关联 "武汉光谷科技有限公司"，有 3 个已发布岗位
+- `hr2@enterprise.com` 关联 "长江智能制造有限公司"，有 2 个岗位
+- `hr3@enterprise.com` 关联 "楚天云计算服务有限公司"，有 2 个岗位
 
-## 测试数据
+## 重置测试数据
 
-### 企业 (3家)
-- 武汉光谷科技有限公司 (互联网/IT)
-- 长江智能制造有限公司 (智能制造)
-- 楚天云计算服务有限公司 (云计算)
-
-### 学校 (3所)
-- 武汉大学 (综合性)
-- 华中科技大学 (理工)
-- 武汉理工大学 (理工)
-
-### 岗位 (7个)
-| 岗位 | 企业 | 薪资 | 学历 |
-|-----|------|------|------|
-| 前端开发工程师 | 光谷科技 | 12-20K | 本科 |
-| 后端开发工程师 | 光谷科技 | 15-25K | 本科 |
-| AI算法工程师 | 光谷科技 | 20-35K | 硕士 |
-| 机械设计工程师 | 长江智造 | 10-18K | 本科 |
-| 电气工程师 | 长江智造 | 12-20K | 本科 |
-| 云运维工程师 | 楚天云 | 12-20K | 本科 |
-| 产品经理 | 楚天云 | 15-25K | 本科 |
-
-### 政策 (4条)
-- 武汉市大学生落户政策 (人才类)
-- 大学毕业生租房补贴 (住房类)
-- 大学生创业担保贷款 (创业类)
-- 高校毕业生就业补贴 (补贴类)
-
-## C 端 (扣子平台)
-
-C 端用户通过豆包 App 访问，使用豆包账号体系，无需单独注册。
+```bash
+cd web
+npx prisma db seed
+```

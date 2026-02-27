@@ -21,7 +21,7 @@ async function verifyApplicationOwnership(
 
     // 企业用户：验证岗位是否属于该企业
     if (user.role === 'ENTERPRISE' && user.enterpriseId) {
-      if (application.job?.enterprise?.id !== user.enterpriseId) {
+      if (application.Job?.Enterprise?.id !== user.enterpriseId) {
         return { authorized: false, error: '无权操作此投递记录' }
       }
     }

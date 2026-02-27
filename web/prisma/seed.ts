@@ -5,6 +5,7 @@
 
 import { PrismaClient, UserRole, UserStatus, JobStatus, PolicyType } from '@prisma/client'
 import bcrypt from 'bcryptjs'
+import cuid from 'cuid'
 
 const prisma = new PrismaClient()
 
@@ -31,13 +32,16 @@ async function main() {
   // ==================== 创建管理员账号 ====================
   console.log('👤 创建管理员账号...')
   const adminPassword = await bcrypt.hash('admin123', SALT_ROUNDS)
+  const now = new Date()
   const admin = await prisma.user.create({
     data: {
+      id: cuid(),
       email: 'admin@wehan.com',
       name: '系统管理员',
       password: adminPassword,
       role: UserRole.ADMIN,
       status: UserStatus.ACTIVE,
+      updatedAt: now,
     },
   })
   console.log('  ✅ 管理员: admin@wehan.com / admin123')
@@ -47,6 +51,7 @@ async function main() {
   const enterprises = await Promise.all([
     prisma.enterprise.create({
       data: {
+        id: cuid(),
         name: '武汉光谷科技有限公司',
         industry: '互联网/IT',
         scale: '200-500',
@@ -56,10 +61,12 @@ async function main() {
         contactPhone: '027-88888888',
         contactEmail: 'hr@guanggu-tech.com',
         verified: true,
+        updatedAt: now,
       },
     }),
     prisma.enterprise.create({
       data: {
+        id: cuid(),
         name: '长江智能制造有限公司',
         industry: '智能制造',
         scale: '500-1000',
@@ -69,10 +76,12 @@ async function main() {
         contactPhone: '027-87654321',
         contactEmail: 'hr@changjiang-smart.com',
         verified: true,
+        updatedAt: now,
       },
     }),
     prisma.enterprise.create({
       data: {
+        id: cuid(),
         name: '楚天云计算服务有限公司',
         industry: '云计算',
         scale: '50-200',
@@ -82,6 +91,7 @@ async function main() {
         contactPhone: '027-87651234',
         contactEmail: 'hr@chutian-cloud.com',
         verified: true,
+        updatedAt: now,
       },
     }),
   ])
@@ -94,12 +104,14 @@ async function main() {
     enterprises.map((enterprise, index) =>
       prisma.user.create({
         data: {
+          id: cuid(),
           email: `hr${index + 1}@enterprise.com`,
           name: `${enterprise.name}HR`,
           password: enterprisePassword,
           role: UserRole.ENTERPRISE,
           status: UserStatus.ACTIVE,
           enterpriseId: enterprise.id,
+          updatedAt: now,
         },
       })
     )
@@ -111,6 +123,7 @@ async function main() {
   const schools = await Promise.all([
     prisma.school.create({
       data: {
+        id: cuid(),
         name: '武汉大学',
         type: '综合性',
         level: '本科',
@@ -118,10 +131,12 @@ async function main() {
         contactName: '就业中心',
         contactPhone: '027-68754123',
         verified: true,
+        updatedAt: now,
       },
     }),
     prisma.school.create({
       data: {
+        id: cuid(),
         name: '华中科技大学',
         type: '理工',
         level: '本科',
@@ -129,10 +144,12 @@ async function main() {
         contactName: '就业指导中心',
         contactPhone: '027-87542136',
         verified: true,
+        updatedAt: now,
       },
     }),
     prisma.school.create({
       data: {
+        id: cuid(),
         name: '武汉理工大学',
         type: '理工',
         level: '本科',
@@ -140,6 +157,7 @@ async function main() {
         contactName: '招生就业处',
         contactPhone: '027-87859017',
         verified: true,
+        updatedAt: now,
       },
     }),
   ])
@@ -152,12 +170,14 @@ async function main() {
     schools.map((school) =>
       prisma.user.create({
         data: {
+          id: cuid(),
           email: `${school.name.replace(/大学|学院/g, '').toLowerCase()}@school.com`,
           name: `${school.name}就业办`,
           password: schoolPassword,
           role: UserRole.SCHOOL,
           status: UserStatus.ACTIVE,
           schoolManagedId: school.id,
+          updatedAt: now,
         },
       })
     )
@@ -169,11 +189,13 @@ async function main() {
   const governmentPassword = await bcrypt.hash('government123', SALT_ROUNDS)
   const governmentUser = await prisma.user.create({
     data: {
+      id: cuid(),
       email: 'gov@wuhan.gov.cn',
       name: '武汉市人才服务中心',
       password: governmentPassword,
       role: UserRole.GOVERNMENT,
       status: UserStatus.ACTIVE,
+      updatedAt: now,
     },
   })
   console.log('  ✅ 政府用户: gov@wuhan.gov.cn / government123')
@@ -184,6 +206,7 @@ async function main() {
     // 企业1的岗位
     prisma.job.create({
       data: {
+        id: cuid(),
         title: '前端开发工程师',
         enterpriseId: enterprises[0].id,
         industry: '互联网/IT',
@@ -213,10 +236,12 @@ async function main() {
         headcount: 3,
         status: JobStatus.PUBLISHED,
         publishedAt: new Date(),
+        updatedAt: now,
       },
     }),
     prisma.job.create({
       data: {
+        id: cuid(),
         title: '后端开发工程师',
         enterpriseId: enterprises[0].id,
         industry: '互联网/IT',
@@ -234,10 +259,12 @@ async function main() {
         headcount: 2,
         status: JobStatus.PUBLISHED,
         publishedAt: new Date(),
+        updatedAt: now,
       },
     }),
     prisma.job.create({
       data: {
+        id: cuid(),
         title: 'AI算法工程师',
         enterpriseId: enterprises[0].id,
         industry: '互联网/IT',
@@ -255,11 +282,13 @@ async function main() {
         headcount: 2,
         status: JobStatus.PUBLISHED,
         publishedAt: new Date(),
+        updatedAt: now,
       },
     }),
     // 企业2的岗位
     prisma.job.create({
       data: {
+        id: cuid(),
         title: '机械设计工程师',
         enterpriseId: enterprises[1].id,
         industry: '智能制造',
@@ -277,10 +306,12 @@ async function main() {
         headcount: 5,
         status: JobStatus.PUBLISHED,
         publishedAt: new Date(),
+        updatedAt: now,
       },
     }),
     prisma.job.create({
       data: {
+        id: cuid(),
         title: '电气工程师',
         enterpriseId: enterprises[1].id,
         industry: '智能制造',
@@ -298,11 +329,13 @@ async function main() {
         headcount: 3,
         status: JobStatus.PUBLISHED,
         publishedAt: new Date(),
+        updatedAt: now,
       },
     }),
     // 企业3的岗位
     prisma.job.create({
       data: {
+        id: cuid(),
         title: '云运维工程师',
         enterpriseId: enterprises[2].id,
         industry: '云计算',
@@ -320,10 +353,12 @@ async function main() {
         headcount: 2,
         status: JobStatus.PUBLISHED,
         publishedAt: new Date(),
+        updatedAt: now,
       },
     }),
     prisma.job.create({
       data: {
+        id: cuid(),
         title: '产品经理',
         enterpriseId: enterprises[2].id,
         industry: '云计算',
@@ -341,6 +376,7 @@ async function main() {
         headcount: 1,
         status: JobStatus.PUBLISHED,
         publishedAt: new Date(),
+        updatedAt: now,
       },
     }),
   ])
@@ -351,6 +387,7 @@ async function main() {
   const policies = await Promise.all([
     prisma.policy.create({
       data: {
+        id: cuid(),
         title: '武汉市大学生落户政策',
         type: PolicyType.TALENT,
         content: `为吸引和留住优秀人才，武汉市出台了一系列大学生落户优惠政策。
@@ -364,10 +401,12 @@ async function main() {
         benefits: '落户便捷、无社保年限要求、办理速度快',
         effectiveDate: new Date('2024-01-01'),
         isActive: true,
+        updatedAt: now,
       },
     }),
     prisma.policy.create({
       data: {
+        id: cuid(),
         title: '大学毕业生租房补贴',
         type: PolicyType.HOUSING,
         content: `武汉市为大学毕业生提供租房补贴支持。
@@ -381,10 +420,12 @@ async function main() {
         benefits: '本科800元/月，硕士1200元/月，博士2000元/月',
         effectiveDate: new Date('2024-01-01'),
         isActive: true,
+        updatedAt: now,
       },
     }),
     prisma.policy.create({
       data: {
+        id: cuid(),
         title: '大学生创业担保贷款',
         type: PolicyType.ENTREPRENEUR,
         content: `支持大学生在武汉创业，提供免担保贷款。
@@ -400,10 +441,12 @@ async function main() {
         benefits: '最高50万元免担保贷款，财政贴息',
         effectiveDate: new Date('2024-01-01'),
         isActive: true,
+        updatedAt: now,
       },
     }),
     prisma.policy.create({
       data: {
+        id: cuid(),
         title: '高校毕业生就业补贴',
         type: PolicyType.SUBSIDY,
         content: `对到中小微企业就业的高校毕业生给予就业补贴。
@@ -417,6 +460,7 @@ async function main() {
         benefits: '一次性发放5000-15000元',
         effectiveDate: new Date('2024-01-01'),
         isActive: true,
+        updatedAt: now,
       },
     }),
   ])
@@ -426,6 +470,7 @@ async function main() {
   console.log('⚙️ 创建门户配置...')
   await prisma.portalConfig.create({
     data: {
+      id: cuid(),
       key: 'site_info',
       value: {
         name: '才聚江城',
@@ -434,6 +479,7 @@ async function main() {
         contactPhone: '027-12345678',
       },
       description: '网站基本信息配置',
+      updatedAt: now,
     },
   })
   console.log('  ✅ 创建门户配置')

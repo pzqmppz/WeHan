@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { AntdRegistry } from '@ant-design/nextjs-registry'
 import { ConfigProvider } from 'antd'
 import zhCN from 'antd/locale/zh_CN'
+import { SessionProvider } from 'next-auth/react'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -18,11 +19,12 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body className="antialiased">
-        <AntdRegistry>
-          <ConfigProvider
-            locale={zhCN}
-            theme={{
-              token: {
+        <SessionProvider>
+          <AntdRegistry>
+            <ConfigProvider
+              locale={zhCN}
+              theme={{
+                token: {
                 colorPrimary: '#1890ff',
                 borderRadius: 6,
               },
@@ -31,6 +33,7 @@ export default function RootLayout({
             {children}
           </ConfigProvider>
         </AntdRegistry>
+      </SessionProvider>
       </body>
     </html>
   )

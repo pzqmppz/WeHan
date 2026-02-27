@@ -11,6 +11,15 @@ import { ZodError } from 'zod'
  */
 export async function GET(request: NextRequest) {
   try {
+    // 验证用户登录
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: '请先登录' },
+        { status: 401 }
+      )
+    }
+
     const { searchParams } = new URL(request.url)
 
     // 验证并解析查询参数
@@ -62,9 +71,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 验证企业权限
-    const enterpriseId = (user as any).enterpriseId
-    if (!enterpriseId) {
+    // 验证企业权限 - 使用 getCurrentUser 返回的 enterpriseId
+    if (!user.enterpriseId) {
       return NextResponse.json(
         { success: false, error: '请先完善企业信息' },
         { status: 403 }
@@ -76,7 +84,7 @@ export async function POST(request: NextRequest) {
     // 验证输入，使用 session 中的 enterpriseId（安全）
     const validated = CreateJobSchema.parse({
       ...body,
-      enterpriseId, // 覆盖客户端传递的值，防止伪造
+      enterpriseId: user.enterpriseId, // 覆盖客户端传递的值，防止伪造
     })
 
     // 调用 Service 创建岗位

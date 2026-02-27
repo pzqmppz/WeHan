@@ -101,7 +101,7 @@ export default function EnterpriseDashboard() {
         <Col xs={24} lg={14}>
           <Card
             title="最新投递"
-            extra={<a href="/dashboard/enterprise/applications">查看全部</a>}
+            extra={<a href="/enterprise/applications">查看全部</a>}
           >
             <List
               dataSource={recentApplications}

@@ -4,6 +4,7 @@
  */
 
 import { auth } from '@/app/api/auth/[...nextauth]/route'
+import { prisma } from '@/lib/prisma'
 import type { UserRole } from '@prisma/client'
 
 export interface SessionUser {
@@ -11,6 +12,8 @@ export interface SessionUser {
   email: string
   name: string
   role: UserRole
+  enterpriseId?: string
+  schoolManagedId?: string
 }
 
 /**
@@ -24,11 +27,23 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
     return null
   }
 
+  // 从数据库获取完整用户信息，确保 enterpriseId 存在
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    include: { Enterprise: true },
+  })
+
+  if (!user) {
+    return null
+  }
+
   return {
-    id: session.user.id || '',
-    email: session.user.email || '',
-    name: session.user.name || '',
-    role: (session.user as any).role as UserRole,
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role as UserRole,
+    enterpriseId: user.enterpriseId ?? undefined,
+    schoolManagedId: user.schoolManagedId ?? undefined,
   }
 }
 

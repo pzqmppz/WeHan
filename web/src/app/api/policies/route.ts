@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import cuid from 'cuid'
 
 // GET /api/policies - 获取政策列表
 export async function GET(request: NextRequest) {
@@ -49,9 +50,11 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
+    const now = new Date()
 
     const policy = await prisma.policy.create({
       data: {
+        id: cuid(),
         title: body.title,
         type: body.type,
         content: body.content,
@@ -61,6 +64,7 @@ export async function POST(request: NextRequest) {
         effectiveDate: body.effectiveDate ? new Date(body.effectiveDate) : undefined,
         expiryDate: body.expiryDate ? new Date(body.expiryDate) : undefined,
         isActive: true,
+        updatedAt: now,
       },
     })
 

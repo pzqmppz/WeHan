@@ -5,6 +5,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { Application, Prisma, ApplicationStatus } from '@prisma/client'
+import cuid from 'cuid'
 
 export interface ApplicationFilter {
   status?: string
@@ -19,22 +20,22 @@ export interface ApplicationPagination {
 }
 
 export interface ApplicationWithRelations extends Application {
-  user: {
+  User: {
     id: string
     name: string
     email: string
     major: string | null
   }
-  job: {
+  Job: {
     id: string
     title: string
     location: string | null
-    enterprise: {
+    Enterprise: {
       id: string
       name: string
     }
   }
-  interview: {
+  Interview: {
     totalScore: number | null
     status: string
   } | null
@@ -63,14 +64,14 @@ export const applicationRepository = {
     }
 
     if (filter.enterpriseId) {
-      where.job = { enterpriseId: filter.enterpriseId }
+      where.Job = { enterpriseId: filter.enterpriseId }
     }
 
     const [applications, total] = await Promise.all([
       prisma.application.findMany({
         where,
         include: {
-          user: {
+          User: {
             select: {
               id: true,
               name: true,
@@ -78,12 +79,12 @@ export const applicationRepository = {
               major: true,
             },
           },
-          job: {
+          Job: {
             select: {
               id: true,
               title: true,
               location: true,
-              enterprise: {
+              Enterprise: {
                 select: {
                   id: true,
                   name: true,
@@ -91,7 +92,7 @@ export const applicationRepository = {
               },
             },
           },
-          interview: {
+          Interview: {
             select: {
               totalScore: true,
               status: true,
@@ -115,7 +116,7 @@ export const applicationRepository = {
     return prisma.application.findUnique({
       where: { id },
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -123,12 +124,12 @@ export const applicationRepository = {
             major: true,
           },
         },
-        job: {
+        Job: {
           select: {
             id: true,
             title: true,
             location: true,
-            enterprise: {
+            Enterprise: {
               select: {
                 id: true,
                 name: true,
@@ -136,7 +137,7 @@ export const applicationRepository = {
             },
           },
         },
-        interview: {
+        Interview: {
           select: {
             totalScore: true,
             status: true,
@@ -169,12 +170,14 @@ export const applicationRepository = {
   }): Promise<Application> {
     return prisma.application.create({
       data: {
+        id: cuid(),
         userId: data.userId,
         jobId: data.jobId,
         resumeId: data.resumeId,
         interviewId: data.interviewId,
         matchScore: data.matchScore,
         status: 'PENDING',
+        updatedAt: new Date(),
       },
     })
   },
@@ -211,7 +214,7 @@ export const applicationRepository = {
 
     return prisma.application.count({
       where: {
-        job: { enterpriseId },
+        Job: { enterpriseId },
         createdAt: { gte: today },
       },
     })
@@ -223,7 +226,7 @@ export const applicationRepository = {
   async countPendingByEnterprise(enterpriseId: string): Promise<number> {
     return prisma.application.count({
       where: {
-        job: { enterpriseId },
+        Job: { enterpriseId },
         status: 'PENDING',
       },
     })
@@ -241,14 +244,14 @@ export const applicationRepository = {
       where: { id: { in: ids } },
       select: {
         id: true,
-        job: {
+        Job: {
           select: { enterpriseId: true },
         },
       },
     })
 
     return applications
-      .filter(app => app.job.enterpriseId !== enterpriseId)
+      .filter(app => app.Job.enterpriseId !== enterpriseId)
       .map(app => app.id)
   },
 
@@ -273,7 +276,7 @@ export const applicationRepository = {
     const result = await prisma.application.updateMany({
       where: {
         id: { in: ids },
-        job: { enterpriseId }, // 只更新属于该企业的投递
+        Job: { enterpriseId }, // 只更新属于该企业的投递
       },
       data: updateData,
     })

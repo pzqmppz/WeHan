@@ -87,24 +87,7 @@ export default function ApplicationsPage() {
   // 获取企业ID
   const enterpriseId = (session?.user as any)?.enterpriseId
 
-  // 处理 session 加载状态
-  if (status === 'loading') {
-    return (
-      <DashboardLayout role="enterprise">
-        <div className="flex items-center justify-center h-64">
-          <Spin size="large" />
-        </div>
-      </DashboardLayout>
-    )
-  }
-
-  // 未登录
-  if (status === 'unauthenticated') {
-    router.push('/login?callbackUrl=/enterprise/applications')
-    return null
-  }
-
-  // 加载投递列表
+  // 加载投递列表 - hooks 必须在早期返回之前调用
   const fetchApplications = useCallback(async (page = 1, pageSize = 10, filters = {}) => {
     if (!enterpriseId) return
 
@@ -163,6 +146,23 @@ export default function ApplicationsPage() {
       fetchStatistics()
     }
   }, [enterpriseId, fetchApplications, fetchStatistics])
+
+  // 处理 session 加载状态 - 早期返回必须在所有 hooks 之后
+  if (status === 'loading') {
+    return (
+      <DashboardLayout role="enterprise">
+        <div className="flex items-center justify-center h-64">
+          <Spin size="large" />
+        </div>
+      </DashboardLayout>
+    )
+  }
+
+  // 未登录
+  if (status === 'unauthenticated') {
+    router.push('/login?callbackUrl=/enterprise/applications')
+    return null
+  }
 
   // Tab 切换
   const handleTabChange = (key: string) => {

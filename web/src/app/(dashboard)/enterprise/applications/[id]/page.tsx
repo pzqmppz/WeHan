@@ -21,7 +21,7 @@ interface Application {
   notes: string | null
   createdAt: string
   updatedAt: string
-  user: {
+  User: {
     id: string
     name: string
     email: string
@@ -30,13 +30,13 @@ interface Application {
     major?: string
     graduationYear?: number
   }
-  job: {
+  Job: {
     id: string
     title: string
     location: string | null
     salaryMin: number | null
     salaryMax: number | null
-    enterprise: { name: string }
+    Enterprise: { name: string }
   }
   resume?: {
     id: string
@@ -47,7 +47,7 @@ interface Application {
     projects?: any[]
     skills: string[]
   }
-  interview?: {
+  Interview?: {
     id: string
     totalScore: number | null
     dimensions?: any[]
@@ -158,9 +158,9 @@ export default function ApplicationDetailPage() {
 
   // 格式化薪资
   const formatSalary = () => {
-    if (!application?.job.salaryMin && !application?.job.salaryMax) return '面议'
-    const min = application?.job.salaryMin ? `${(application.job.salaryMin / 1000).toFixed(0)}K` : ''
-    const max = application?.job.salaryMax ? `${(application.job.salaryMax / 1000).toFixed(0)}K` : ''
+    if (!application?.Job.salaryMin && !application?.Job.salaryMax) return '面议'
+    const min = application?.Job.salaryMin ? `${(application.Job.salaryMin / 1000).toFixed(0)}K` : ''
+    const max = application?.Job.salaryMax ? `${(application.Job.salaryMax / 1000).toFixed(0)}K` : ''
     return min && max ? `${min}-${max}` : min || max
   }
 
@@ -226,7 +226,7 @@ export default function ApplicationDetailPage() {
             返回
           </Button>
           <div>
-            <Title level={4} className="!mb-0">{application.user.name} 的投递</Title>
+            <Title level={4} className="!mb-0">{application.User.name} 的投递</Title>
             <Space className="mt-1">
               <Tag color={statusConfig.color}>{statusConfig.label}</Tag>
               <Text type="secondary">
@@ -280,11 +280,11 @@ export default function ApplicationDetailPage() {
             <div className="flex items-start gap-4">
               <Avatar size={64} icon={<UserOutlined />} className="bg-blue-500" />
               <div className="flex-1">
-                <Title level={4} className="!mb-2">{application.user.name}</Title>
+                <Title level={4} className="!mb-2">{application.User.name}</Title>
                 <Space direction="vertical" size="small">
                   <Space>
                     <MailOutlined />
-                    <Text>{application.user.email}</Text>
+                    <Text>{application.User.email}</Text>
                   </Space>
                   {application.resume?.phone && (
                     <Space>
@@ -292,11 +292,11 @@ export default function ApplicationDetailPage() {
                       <Text>{application.resume.phone}</Text>
                     </Space>
                   )}
-                  {application.user.school && (
+                  {application.User.school && (
                     <Text type="secondary">
-                      {application.user.school.name}
-                      {application.user.major && ` · ${application.user.major}`}
-                      {application.user.graduationYear && ` · ${application.user.graduationYear}届`}
+                      {application.User.school.name}
+                      {application.User.major && ` · ${application.User.major}`}
+                      {application.User.graduationYear && ` · ${application.User.graduationYear}届`}
                     </Text>
                   )}
                 </Space>
@@ -370,13 +370,13 @@ export default function ApplicationDetailPage() {
           )}
 
           {/* 面试报告 */}
-          {application.interview && (
+          {application.Interview && (
             <Card title="AI 面试报告" className="mb-4">
               <Descriptions column={1} bordered size="small">
                 <Descriptions.Item label="综合评分">
-                  {formatMatchScore(application.interview.totalScore)}
+                  {formatMatchScore(application.Interview.totalScore)}
                 </Descriptions.Item>
-                {application.interview.dimensions?.map((dim: any, idx: number) => (
+                {application.Interview.dimensions?.map((dim: any, idx: number) => (
                   <Descriptions.Item key={idx} label={dim.name}>
                     <Space>
                       <Text>{dim.score}/{dim.maxScore}</Text>
@@ -384,9 +384,9 @@ export default function ApplicationDetailPage() {
                     </Space>
                   </Descriptions.Item>
                 ))}
-                {application.interview.suggestions && (
+                {application.Interview.suggestions && (
                   <Descriptions.Item label="改进建议">
-                    <Paragraph className="mb-0">{application.interview.suggestions}</Paragraph>
+                    <Paragraph className="mb-0">{application.Interview.suggestions}</Paragraph>
                   </Descriptions.Item>
                 )}
               </Descriptions>
@@ -399,15 +399,15 @@ export default function ApplicationDetailPage() {
           <Card title="投递岗位" className="mb-4">
             <Descriptions column={1} size="small">
               <Descriptions.Item label="岗位名称">
-                <a onClick={() => router.push(`/enterprise/jobs/${application.job.id}`)}>
-                  {application.job.title}
+                <a onClick={() => router.push(`/enterprise/jobs/${application.Job.id}`)}>
+                  {application.Job.title}
                 </a>
               </Descriptions.Item>
               <Descriptions.Item label="所属企业">
-                {application.job.enterprise.name}
+                {application.Job.Enterprise.name}
               </Descriptions.Item>
               <Descriptions.Item label="工作地点">
-                {application.job.location || '未填写'}
+                {application.Job.location || '未填写'}
               </Descriptions.Item>
               <Descriptions.Item label="薪资范围">
                 {formatSalary()}
