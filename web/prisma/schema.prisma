@@ -1,0 +1,378 @@
+// Prisma Schema for 才聚江城 - 武汉人才留汉智能服务平台
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== 用户相关 ====================
+
+// 用户角色枚举
+enum UserRole {
+  STUDENT    // 学生(C端)
+  ENTERPRISE // 企业
+  SCHOOL     // 学校
+  GOVERNMENT // 政府
+  ADMIN      // 管理员
+}
+
+// 用户状态枚举
+enum UserStatus {
+  ACTIVE     // 正常
+  INACTIVE   // 禁用
+  PENDING    // 待审核
+  REJECTED   // 审核拒绝
+}
+
+// 用户表
+model User {
+  id            String      @id @default(cuid())
+  email         String      @unique
+  phone         String?     @unique
+  password      String
+  name          String
+  avatar        String?
+  role          UserRole
+  status        UserStatus  @default(PENDING)
+
+  // 学生特有字段
+  schoolId      String?
+  major         String?
+  graduationYear Int?
+
+  // 企业特有字段
+  enterpriseId  String?
+
+  // 学校特有字段
+  schoolManagedId String?
+
+  // 时间戳
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  lastLoginAt   DateTime?
+
+  // 关联 - 只在一侧定义 fields 和 references
+  resume        Resume?
+  enterprise    Enterprise?  @relation(fields: [enterpriseId], references: [id])
+  schoolManaged School?      @relation(fields: [schoolManagedId], references: [id])
+  applications  Application[]
+  interviews    Interview[]
+  emotionRecords EmotionRecord[]
+
+  @@index([role])
+  @@index([status])
+}
+
+// ==================== 企业相关 ====================
+
+model Enterprise {
+  id              String      @id @default(cuid())
+  name            String
+  logo            String?
+  industry        String
+  scale           String      // 规模: 0-50, 50-200, 200-500, 500-1000, 1000+
+  description     String?
+  address         String?
+  contactName     String?
+  contactPhone    String?
+  contactEmail    String?
+  businessLicense String?     // 营业执照
+  verified        Boolean     @default(false)
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // 关联
+  users           User[]
+  jobs            Job[]
+
+  @@index([industry])
+  @@index([verified])
+}
+
+// ==================== 学校相关 ====================
+
+model School {
+  id              String      @id @default(cuid())
+  name            String
+  logo            String?
+  type            String      // 类型: 综合性/理工/师范/医药等
+  level           String      // 层次: 本科/专科/研究生
+  address         String?
+  contactName     String?
+  contactPhone    String?
+  verified        Boolean     @default(false)
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // 关联
+  users           User[]
+  jobPushRecords  JobPushRecord[]
+
+  @@index([verified])
+}
+
+// ==================== 岗位相关 ====================
+
+// 岗位状态
+enum JobStatus {
+  DRAFT       // 草稿
+  PUBLISHED   // 已发布
+  CLOSED      // 已关闭
+  ARCHIVED    // 已归档
+}
+
+model Job {
+  id              String      @id @default(cuid())
+  title           String
+  enterpriseId    String
+  industry        String?
+  category        String?     // 岗位类别
+  salaryMin       Int?        // 最低薪资(元/月)
+  salaryMax       Int?        // 最高薪资(元/月)
+  location        String?     // 工作地点
+  address         String?     // 详细地址
+  description     String      @db.Text // 岗位描述(JD)
+  requirements    String?     @db.Text // 任职要求
+  benefits        String?     @db.Text // 福利待遇
+  skills          String[]    // 技能要求
+  educationLevel  String?     // 学历要求
+  experienceYears Int?        // 经验要求(年)
+  freshGraduate   Boolean     @default(true) // 是否接受应届生
+  headcount       Int         @default(1)    // 招聘人数
+  status          JobStatus   @default(DRAFT)
+
+  // 自定义面试问题
+  interviewQuestions String?  @db.Text // JSON数组
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  publishedAt     DateTime?
+
+  // 关联
+  enterprise      Enterprise  @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
+  applications    Application[]
+  jobPushRecords  JobPushRecord[]
+
+  @@index([enterpriseId])
+  @@index([status])
+  @@index([industry])
+  @@index([location])
+}
+
+// ==================== 简历相关 ====================
+
+model Resume {
+  id              String      @id @default(cuid())
+  userId          String      @unique
+  originalUrl     String?     // 原始简历文件URL
+
+  // AI解析后的结构化数据
+  name            String?
+  phone           String?
+  email           String?
+  education       Json?       // 教育经历
+  experiences     Json?       // 工作经历
+  projects        Json?       // 项目经历
+  skills          String[]    // 技能列表
+  certifications  Json?       // 证书
+  awards          Json?       // 奖项
+
+  // AI生成的人才画像
+  profile         Json?       // 人才画像
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // 关联 - 不需要定义 fields/references，由 User 端定义
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ==================== 投递相关 ====================
+
+// 投递状态
+enum ApplicationStatus {
+  PENDING       // 待处理
+  VIEWED        // 已查看
+  INTERVIEWING  // 面试中
+  OFFERED       // 已录用
+  REJECTED      // 已拒绝
+  WITHDRAWN     // 已撤回
+}
+
+model Application {
+  id              String          @id @default(cuid())
+  userId          String
+  jobId           String
+  resumeId        String?
+  interviewId     String?         @unique
+
+  // 匹配信息
+  matchScore      Float?          // 匹配度评分(0-100)
+
+  // 状态
+  status          ApplicationStatus @default(PENDING)
+
+  // 企业端备注
+  notes           String?         @db.Text
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  viewedAt        DateTime?       // 企业查看时间
+
+  // 关联
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job             Job             @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  interview       Interview?      // 不定义 fields，由 Interview 端定义
+
+  @@unique([userId, jobId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ==================== 面试相关 ====================
+
+// 面试状态
+enum InterviewStatus {
+  PREPARING    // 准备中
+  IN_PROGRESS  // 进行中
+  COMPLETED    // 已完成
+  EXPIRED      // 已过期
+}
+
+model Interview {
+  id              String          @id @default(cuid())
+  userId          String
+  jobId           String?
+  applicationId   String?         @unique
+
+  // 面试大纲
+  outline         Json?           // AI生成的面试题目框架
+
+  // 面试过程
+  conversation    Json?           // 对话记录
+  duration        Int?            // 面试时长(秒)
+
+  // 评估报告
+  status          InterviewStatus @default(PREPARING)
+  totalScore      Float?          // 综合评分(0-100)
+  dimensions      Json?           // 各维度评分
+  highlights      Json?           // 亮点回答
+  improvements    Json?           // 待改进点
+  suggestions     String?         @db.Text // 改进建议
+
+  // 语音文件
+  audioUrl        String?         // 录音文件URL
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  completedAt     DateTime?
+
+  // 关联
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  application     Application?    @relation(fields: [applicationId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+}
+
+// ==================== 政策相关 ====================
+
+// 政策类型
+enum PolicyType {
+  SUBSIDY      // 补贴类
+  HOUSING      // 住房类
+  TALENT       // 人才类
+  ENTREPRENEUR // 创业类
+  OTHER        // 其他
+}
+
+model Policy {
+  id              String      @id @default(cuid())
+  title           String
+  type            PolicyType
+  content         String      @db.Text
+  summary         String?     @db.Text // 摘要
+  conditions      String?     @db.Text // 适用条件
+  benefits        String?     @db.Text // 政策福利
+  effectiveDate   DateTime?
+  expiryDate      DateTime?
+  isActive        Boolean     @default(true)
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([type])
+  @@index([isActive])
+}
+
+// ==================== 岗位推送记录 ====================
+
+model JobPushRecord {
+  id              String      @id @default(cuid())
+  jobId           String
+  schoolId        String
+  targetMajors    String[]    // 目标专业
+  pushCount       Int         @default(0) // 推送人数
+
+  createdAt       DateTime    @default(now())
+
+  // 关联
+  job             Job         @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  school          School      @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@index([schoolId])
+  @@index([createdAt])
+}
+
+// ==================== 情绪记录(C端心理健康) ====================
+
+model EmotionRecord {
+  id              String      @id @default(cuid())
+  userId          String
+  emotion         String      // 情绪类型: happy/sad/anxious等
+  score           Int         // 情绪分数(1-10)
+  content         String?     @db.Text // 记录内容
+  tags            String[]    // 标签
+
+  createdAt       DateTime    @default(now())
+
+  // 关联
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// ==================== 门户配置 ====================
+
+model PortalConfig {
+  id              String      @id @default(cuid())
+  key             String      @unique
+  value           Json
+  description     String?
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+// ==================== 统计数据 ====================
+
+model Statistics {
+  id              String      @id @default(cuid())
+  date            DateTime    @db.Date
+  type            String      // 统计类型
+  key             String      // 统计键
+  value           Int         // 统计值
+
+  createdAt       DateTime    @default(now())
+
+  @@unique([date, type, key])
+  @@index([date])
+  @@index([type])
+}
