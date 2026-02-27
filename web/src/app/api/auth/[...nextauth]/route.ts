@@ -61,6 +61,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return session
     },
+    async redirect({ url, baseUrl }) {
+      // 如果 url 是相对路径，拼接 baseUrl
+      if (url.startsWith('/')) return `${baseUrl}${url}`
+      // 如果 url 是同域名，直接返回
+      else if (new URL(url).origin === baseUrl) return url
+      // 默认返回 baseUrl
+      return baseUrl
+    },
   },
 })
 

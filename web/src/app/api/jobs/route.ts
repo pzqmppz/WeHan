@@ -1,105 +1,103 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { jobService } from '@/services'
+import { JobQuerySchema, CreateJobSchema } from '@/lib/validators'
+import { getCurrentUser } from '@/lib/auth'
+import { ZodError } from 'zod'
 
-// GET /api/jobs - 获取岗位列表
+// Note: getCurrentUser is defined in @/lib/auth and uses NextAuth's auth() function
+
+/**
+ * GET /api/jobs - 获取岗位列表
+ */
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const page = parseInt(searchParams.get('page') || '1')
-    const pageSize = parseInt(searchParams.get('pageSize') || '10')
-    const industry = searchParams.get('industry')
-    const location = searchParams.get('location')
-    const keyword = searchParams.get('keyword')
 
-    const where: any = {
-      status: 'PUBLISHED',
-    }
+    // 验证并解析查询参数
+    const query = JobQuerySchema.parse({
+      page: searchParams.get('page') || '1',
+      pageSize: searchParams.get('pageSize') || '10',
+      industry: searchParams.get('industry') || undefined,
+      location: searchParams.get('location') || undefined,
+      keyword: searchParams.get('keyword') || undefined,
+      enterpriseId: searchParams.get('enterpriseId') || undefined,
+    })
 
-    if (industry) {
-      where.industry = industry
-    }
-
-    if (location) {
-      where.location = location
-    }
-
-    if (keyword) {
-      where.OR = [
-        { title: { contains: keyword, mode: 'insensitive' } },
-        { description: { contains: keyword, mode: 'insensitive' } },
-      ]
-    }
-
-    const [jobs, total] = await Promise.all([
-      prisma.job.findMany({
-        where,
-        include: {
-          enterprise: {
-            select: {
-              id: true,
-              name: true,
-              logo: true,
-              industry: true,
-            },
-          },
-        },
-        orderBy: { createdAt: 'desc' },
-        skip: (page - 1) * pageSize,
-        take: pageSize,
-      }),
-      prisma.job.count({ where }),
-    ])
+    const result = await jobService.getJobs(query)
 
     return NextResponse.json({
-      data: jobs,
-      pagination: {
-        page,
-        pageSize,
-        total,
-        totalPages: Math.ceil(total / pageSize),
-      },
+      success: true,
+      data: result.data,
+      meta: result.pagination,
     })
   } catch (error) {
     console.error('Get jobs error:', error)
+
+    if (error instanceof ZodError) {
+      return NextResponse.json(
+        { success: false, error: '参数验证失败', details: error.issues },
+        { status: 400 }
+      )
+    }
+
     return NextResponse.json(
-      { error: '获取岗位列表失败' },
+      { success: false, error: '获取岗位列表失败' },
       { status: 500 }
     )
   }
 }
 
-// POST /api/jobs - 创建岗位
+/**
+ * POST /api/jobs - 创建岗位
+ * 需要企业用户登录
+ */
 export async function POST(request: NextRequest) {
   try {
+    // 验证用户登录状态
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: '请先登录' },
+        { status: 401 }
+      )
+    }
+
+    // 验证企业权限
+    const enterpriseId = (user as any).enterpriseId
+    if (!enterpriseId) {
+      return NextResponse.json(
+        { success: false, error: '请先完善企业信息' },
+        { status: 403 }
+      )
+    }
+
     const body = await request.json()
 
-    const job = await prisma.job.create({
-      data: {
-        title: body.title,
-        enterpriseId: body.enterpriseId,
-        industry: body.industry,
-        category: body.category,
-        salaryMin: body.salaryMin,
-        salaryMax: body.salaryMax,
-        location: body.location,
-        address: body.address,
-        description: body.description,
-        requirements: body.requirements,
-        benefits: body.benefits,
-        skills: body.skills || [],
-        educationLevel: body.educationLevel,
-        experienceYears: body.experienceYears,
-        freshGraduate: body.freshGraduate ?? true,
-        headcount: body.headcount || 1,
-        status: 'DRAFT',
-      },
+    // 验证输入，使用 session 中的 enterpriseId（安全）
+    const validated = CreateJobSchema.parse({
+      ...body,
+      enterpriseId, // 覆盖客户端传递的值，防止伪造
     })
 
-    return NextResponse.json({ data: job })
+    // 调用 Service 创建岗位
+    const result = await jobService.createJob(validated)
+
+    return NextResponse.json({
+      success: true,
+      data: result.data,
+    })
   } catch (error) {
     console.error('Create job error:', error)
+
+    if (error instanceof ZodError) {
+      return NextResponse.json(
+        { success: false, error: '参数验证失败', details: error.issues },
+        { status: 400 }
+      )
+    }
+
     return NextResponse.json(
-      { error: '创建岗位失败' },
+      { success: false, error: error instanceof Error ? error.message : '创建岗位失败' },
       { status: 500 }
     )
   }

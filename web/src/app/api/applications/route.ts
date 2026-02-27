@@ -1,125 +1,142 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { applicationService } from '@/services'
+import { ApplicationQuerySchema, CreateApplicationSchema } from '@/lib/validators'
+import { getCurrentUser } from '@/lib/auth'
+import { ZodError } from 'zod'
 
-// GET /api/applications - 获取投递列表
+/**
+ * GET /api/applications - 获取投递列表
+ * 企业用户：查看投递到本企业的申请
+ * 学生用户：查看自己的投递记录
+ */
 export async function GET(request: NextRequest) {
   try {
+    // 验证用户登录
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: '请先登录' },
+        { status: 401 }
+      )
+    }
+
     const { searchParams } = new URL(request.url)
-    const page = parseInt(searchParams.get('page') || '1')
-    const pageSize = parseInt(searchParams.get('pageSize') || '10')
-    const status = searchParams.get('status')
-    const enterpriseId = searchParams.get('enterpriseId')
-    const userId = searchParams.get('userId')
 
-    const where: any = {}
+    // 根据用户角色设置查询范围
+    let queryOverrides: Record<string, string> = {}
 
-    if (status) {
-      where.status = status
+    if (user.role === 'ENTERPRISE') {
+      // 企业用户只能查看投递到本企业的申请
+      const enterpriseId = (user as any).enterpriseId
+      if (!enterpriseId) {
+        return NextResponse.json(
+          { success: false, error: '请先完善企业信息' },
+          { status: 403 }
+        )
+      }
+      queryOverrides.enterpriseId = enterpriseId
+    } else if (user.role === 'STUDENT') {
+      // 学生只能查看自己的投递记录
+      queryOverrides.userId = user.id
     }
+    // ADMIN 可以查看所有投递
 
-    if (enterpriseId) {
-      where.job = { enterpriseId }
-    }
-
-    if (userId) {
-      where.userId = userId
-    }
-
-    const [applications, total] = await Promise.all([
-      prisma.application.findMany({
-        where,
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              major: true,
-            },
-          },
-          job: {
-            select: {
-              id: true,
-              title: true,
-              location: true,
-              enterprise: {
-                select: {
-                  id: true,
-                  name: true,
-                },
-              },
-            },
-          },
-          interview: {
-            select: {
-              totalScore: true,
-              status: true,
-            },
-          },
-        },
-        orderBy: { createdAt: 'desc' },
-        skip: (page - 1) * pageSize,
-        take: pageSize,
+    // 验证并解析查询参数
+    const query = ApplicationQuerySchema.parse({
+      page: searchParams.get('page') || '1',
+      pageSize: searchParams.get('pageSize') || '10',
+      status: searchParams.get('status') || undefined,
+      ...queryOverrides,
+      // 以下参数只对 ADMIN 开放
+      ...(user.role === 'ADMIN' && {
+        enterpriseId: searchParams.get('enterpriseId') || undefined,
+        userId: searchParams.get('userId') || undefined,
+        jobId: searchParams.get('jobId') || undefined,
       }),
-      prisma.application.count({ where }),
-    ])
+    })
+
+    const result = await applicationService.getApplications(query)
 
     return NextResponse.json({
-      data: applications,
-      pagination: {
-        page,
-        pageSize,
-        total,
-        totalPages: Math.ceil(total / pageSize),
-      },
+      success: true,
+      data: result.data,
+      meta: result.pagination,
     })
   } catch (error) {
     console.error('Get applications error:', error)
+
+    if (error instanceof ZodError) {
+      return NextResponse.json(
+        { success: false, error: '参数验证失败' },
+        { status: 400 }
+      )
+    }
+
     return NextResponse.json(
-      { error: '获取投递列表失败' },
+      { success: false, error: '获取投递列表失败' },
       { status: 500 }
     )
   }
 }
 
-// POST /api/applications - 创建投递
+/**
+ * POST /api/applications - 创建投递
+ * 学生用户：投递岗位
+ */
 export async function POST(request: NextRequest) {
   try {
+    // 验证用户登录
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: '请先登录' },
+        { status: 401 }
+      )
+    }
+
+    // 只有学生可以投递
+    if (user.role !== 'STUDENT') {
+      return NextResponse.json(
+        { success: false, error: '只有学生可以投递岗位' },
+        { status: 403 }
+      )
+    }
+
     const body = await request.json()
 
-    // 检查是否已投递
-    const existing = await prisma.application.findUnique({
-      where: {
-        userId_jobId: {
-          userId: body.userId,
-          jobId: body.jobId,
-        },
-      },
+    // 强制使用当前用户ID，防止IDOR攻击
+    const validated = CreateApplicationSchema.parse({
+      ...body,
+      userId: user.id, // 覆盖客户端传递的值
     })
 
-    if (existing) {
+    // 调用 Service 创建投递
+    const result = await applicationService.createApplication(validated)
+
+    return NextResponse.json({
+      success: true,
+      data: result.data,
+    })
+  } catch (error) {
+    console.error('Create application error:', error)
+
+    if (error instanceof ZodError) {
       return NextResponse.json(
-        { error: '您已投递过该岗位' },
+        { success: false, error: '参数验证失败' },
         { status: 400 }
       )
     }
 
-    const application = await prisma.application.create({
-      data: {
-        userId: body.userId,
-        jobId: body.jobId,
-        resumeId: body.resumeId,
-        interviewId: body.interviewId,
-        matchScore: body.matchScore,
-        status: 'PENDING',
-      },
-    })
+    // 业务错误（如已投递）
+    if (error instanceof Error && error.message.includes('已投递')) {
+      return NextResponse.json(
+        { success: false, error: error.message },
+        { status: 400 }
+      )
+    }
 
-    return NextResponse.json({ data: application })
-  } catch (error) {
-    console.error('Create application error:', error)
     return NextResponse.json(
-      { error: '投递失败' },
+      { success: false, error: error instanceof Error ? error.message : '投递失败' },
       { status: 500 }
     )
   }
