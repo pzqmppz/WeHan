@@ -42,8 +42,8 @@ export async function GET(request: NextRequest) {
         include: {
           _count: {
             select: {
-              Job: true,
-              User: true,
+              jobs: true,
+              users: true,
             },
           },
         },
