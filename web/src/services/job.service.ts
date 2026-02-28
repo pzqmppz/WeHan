@@ -17,13 +17,14 @@ export const jobService = {
    * 获取岗位列表
    */
   async getJobs(query: JobQueryInput) {
-    const { page, pageSize, industry, location, keyword, enterpriseId } = query
+    const { page, pageSize, industry, location, keyword, enterpriseId, status } = query
 
     const filter: JobFilter = {}
     if (industry) filter.industry = industry
     if (location) filter.location = location
     if (keyword) filter.keyword = keyword
     if (enterpriseId) filter.enterpriseId = enterpriseId
+    if (status) filter.status = status
 
     const pagination: JobPagination = { page, pageSize }
 

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { AntdRegistry } from '@ant-design/nextjs-registry'
-import { ConfigProvider } from 'antd'
+import { ConfigProvider, App as AntApp } from 'antd'
 import zhCN from 'antd/locale/zh_CN'
 import { SessionProvider } from 'next-auth/react'
 import './globals.css'
@@ -30,7 +30,9 @@ export default function RootLayout({
               },
             }}
           >
-            {children}
+            <AntApp>
+              {children}
+            </AntApp>
           </ConfigProvider>
         </AntdRegistry>
       </SessionProvider>

@@ -22,7 +22,7 @@ export interface TalentPagination {
 export interface TalentWithResume {
   id: string
   name: string
-  email: string
+  email: string | null
   phone: string | null
   major: string | null
   graduationYear: number | null
@@ -115,15 +115,18 @@ export const talentRepository = {
     for (const app of applications) {
       const userId = app.userId
 
+      // 跳过没有 userId 的记录（C 端用户投递）
+      if (!userId) continue
+
       if (!userMap.has(userId)) {
         userMap.set(userId, {
           id: userId,
-          name: app.User.name,
-          email: app.User.email,
-          phone: app.User.Resume?.phone || null,
-          major: app.User.major,
-          graduationYear: app.User.graduationYear,
-          resume: app.User.Resume,
+          name: app.User?.name || '未知用户',
+          email: app.User?.email || null,
+          phone: app.User?.Resume?.[0]?.phone || null,
+          major: app.User?.major || null,
+          graduationYear: app.User?.graduationYear || null,
+          resume: app.User?.Resume?.[0] || null,
           applications: [],
         })
       }
@@ -147,7 +150,7 @@ export const talentRepository = {
       const keyword = filter.keyword.toLowerCase()
       talents = talents.filter(t =>
         t.name.toLowerCase().includes(keyword) ||
-        t.email.toLowerCase().includes(keyword) ||
+        (t.email && t.email.toLowerCase().includes(keyword)) ||
         t.resume?.skills?.some((s: string) => s.toLowerCase().includes(keyword))
       )
     }
@@ -234,10 +237,10 @@ export const talentRepository = {
       id: user.id,
       name: user.name,
       email: user.email,
-      phone: user.Resume?.phone || null,
+      phone: user.Resume?.[0]?.phone || null,
       major: user.major,
       graduationYear: user.graduationYear,
-      resume: user.Resume,
+      resume: user.Resume?.[0] || null,
       applications: applications.map(app => ({
         id: app.id,
         status: app.status,

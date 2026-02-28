@@ -9,3 +9,9 @@ export {
   useSchoolDashboard,
   useAdminDashboard,
 } from './useDashboardData'
+
+export {
+  usePolicies,
+  usePolicyDetail,
+  type Policy,
+} from './usePolicies'

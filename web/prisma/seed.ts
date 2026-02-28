@@ -166,12 +166,13 @@ async function main() {
   // ==================== 创建学校管理员 ====================
   console.log('👤 创建学校管理员...')
   const schoolPassword = await bcrypt.hash('school123', SALT_ROUNDS)
+  const schoolEmails = ['whu@school.com', 'hust@school.com', 'whut@school.com']
   const schoolUsers = await Promise.all(
-    schools.map((school) =>
+    schools.map((school, index) =>
       prisma.user.create({
         data: {
           id: cuid(),
-          email: `${school.name.replace(/大学|学院/g, '').toLowerCase()}@school.com`,
+          email: schoolEmails[index],
           name: `${school.name}就业办`,
           password: schoolPassword,
           role: UserRole.SCHOOL,
@@ -182,7 +183,7 @@ async function main() {
       })
     )
   )
-  console.log('  ✅ 学校用户: 武大 / school123')
+  console.log('  ✅ 学校用户: whu@school.com / school123')
 
   // ==================== 创建政府用户 ====================
   console.log('👤 创建政府用户...')
@@ -489,7 +490,7 @@ async function main() {
   console.log('\n📝 测试账号：')
   console.log('  ├─ 管理员: admin@wehan.com / admin123')
   console.log('  ├─ 企业HR: hr1@enterprise.com / enterprise123')
-  console.log('  ├─ 学校: 武大@school.com / school123')
+  console.log('  ├─ 学校: whu@school.com / school123')
   console.log('  └─ 政府: gov@wuhan.gov.cn / government123')
   console.log('\n📊 数据统计：')
   console.log(`  ├─ 企业: ${enterprises.length} 家`)

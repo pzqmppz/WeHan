@@ -8,23 +8,42 @@ datasource db {
 }
 
 model Application {
-  id          String            @id
-  userId      String
-  jobId       String
-  resumeId    String?
-  interviewId String?           @unique
-  matchScore  Float?
-  status      ApplicationStatus @default(PENDING)
-  notes       String?
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime
-  viewedAt    DateTime?
-  Job         Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  User        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Interview   Interview?
+  id              String            @id
+  userId          String?
+  externalUserId  String?           // C端用户ID（豆包user_id）
+  jobId           String
+  resumeId        String?
+  interviewId     String?           @unique
+  matchScore      Float?
+  status          ApplicationStatus @default(PENDING)
+  notes           String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime
+  viewedAt        DateTime?
+  Job             Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  User            User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Interview       Interview?
 
   @@unique([userId, jobId])
   @@index([createdAt])
+  @@index([status])
+  @@index([externalUserId])
+}
+
+// C端会话管理（不关联User表）
+model Conversation {
+  id                  String   @id @default(cuid())
+  externalUserId      String   // 豆包用户ID
+  cozeConversationId  String   @unique // Coze会话ID
+  title               String?
+  status              String   @default("active") // active/finished/interrupted
+  type                String?  // interview/counseling/general
+  sessionData         Json?    // 完整会话数据（messages, workflowStatus等）
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([externalUserId])
+  @@index([cozeConversationId])
   @@index([status])
 }
 
@@ -65,28 +84,42 @@ model Enterprise {
 }
 
 model Interview {
-  id            String          @id
-  userId        String
-  jobId         String?
-  applicationId String?         @unique
-  outline       Json?
-  conversation  Json?
-  duration      Int?
-  status        InterviewStatus @default(PREPARING)
-  totalScore    Float?
-  dimensions    Json?
-  highlights    Json?
-  improvements  Json?
-  suggestions   String?
-  audioUrl      String?
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime
-  completedAt   DateTime?
-  Application   Application?    @relation(fields: [applicationId], references: [id])
-  User          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id              String          @id
+  userId          String?
+  externalUserId  String?         // C端用户ID（豆包user_id）
+  jobId           String?
+  applicationId   String?         @unique
+
+  // ===== 面试内容 =====
+  outline         Json?           // 题目列表
+  currentIndex    Int?            @default(0)   // 当前面试进度（第几题，用于断点恢复）
+  answers         Json?                       // 回答记录数组（代码层初始化为空数组）
+
+  // ===== 原始记录 =====
+  conversation    Json?           // 原始对话记录
+  duration        Int?
+  audioUrl        String?
+
+  // ===== 评估结果 =====
+  status          InterviewStatus @default(PREPARING)
+  totalScore      Float?
+  dimensions      Json?           // 维度评分
+  highlights      Json?           // 亮点
+  improvements    Json?           // 改进建议
+  suggestions     String?         // 综合建议
+
+  // ===== 时间戳 =====
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime
+  completedAt     DateTime?
+
+  // ===== 关联 =====
+  Application     Application?    @relation(fields: [applicationId], references: [id])
+  User            User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([status])
   @@index([userId])
+  @@index([externalUserId])
 }
 
 model Job {
@@ -165,7 +198,9 @@ model PortalConfig {
 
 model Resume {
   id             String   @id
-  userId         String   @unique
+  userId         String?  @unique
+  externalUserId String?  // C端用户ID（豆包user_id）
+  resumeText     String?  // 原始简历文本（PDF解析后）
   originalUrl    String?
   name           String?
   phone          String?
@@ -179,7 +214,9 @@ model Resume {
   profile        Json?
   createdAt      DateTime @default(now())
   updatedAt      DateTime
-  User           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  User           User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([externalUserId])
 }
 
 model School {
@@ -233,7 +270,7 @@ model User {
   Application     Application[]
   EmotionRecord   EmotionRecord[]
   Interview       Interview[]
-  Resume          Resume?
+  Resume          Resume[]
   Enterprise      Enterprise?     @relation(fields: [enterpriseId], references: [id])
   School          School?         @relation(fields: [schoolManagedId], references: [id])
 

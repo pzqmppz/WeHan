@@ -32,7 +32,7 @@ export interface UserWithRelations extends User {
   Resume?: {
     id: string
     education: any
-  } | null
+  }[]
 }
 
 export const userRepository = {

@@ -10,8 +10,13 @@ export async function GET(request: NextRequest) {
     const pageSize = parseInt(searchParams.get('pageSize') || '10')
     const type = searchParams.get('type')
 
-    const where: any = {
-      isActive: true,
+    const includeInactive = searchParams.get('includeInactive') === 'true'
+
+    const where: any = {}
+
+    // 如果不是包含已下架的，则只显示活跃的
+    if (!includeInactive) {
+      where.isActive = true
     }
 
     if (type) {
@@ -29,6 +34,7 @@ export async function GET(request: NextRequest) {
     ])
 
     return NextResponse.json({
+      success: true,
       data: policies,
       pagination: {
         page,

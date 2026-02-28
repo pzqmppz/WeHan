@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Typography, message, Result, Button } from 'antd'
+import { Typography, App, Result, Button } from 'antd'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import DashboardLayout from '@/components/layout/DashboardLayout'
@@ -13,6 +13,7 @@ export default function CreateJobPage() {
   const sessionData = useSession()
   const { data: session } = sessionData || { data: null }
   const router = useRouter()
+  const { message } = App.useApp()
   const [loading, setLoading] = useState(false)
 
   // 获取企业ID

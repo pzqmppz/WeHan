@@ -43,6 +43,7 @@ export const JobQuerySchema = PaginationSchema.extend({
   keyword: z.string().optional(),
   status: JobStatusSchema.optional(),
   enterpriseId: IdSchema.optional(),
+  all: z.coerce.boolean().optional(), // 是否获取所有企业的岗位（管理员用）
 })
 
 export const CreateJobSchema = z.object({

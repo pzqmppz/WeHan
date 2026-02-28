@@ -601,3 +601,193 @@ Argument `Enterprise` is missing.
 
 再次发布和删除这两个功能全都是正常的。我就是比较诧异，为什么我们的前端对于岗位的操作按钮不能一直保持 4 个呢？就是查看、修改、第三个按钮是下架或者是重新发布，第四个按钮是删除。
 你不觉得这样很统一吗
+
+
+## 017 完整测试
+1.登录| 企业HR | hr1@enterprise.com | enterprise123 |
+各项功能测试正常，在登出时，点击右上角头像，其中的个人设置和退出登录功能均无效
+
+2.直接手动返回登录页面，登录| 学校 | whu@school.com | school123 |
+跳转进了http://localhost:3000/enterprise
+进入首页，显示企业信息不存在。
+调试台报错信息：
+useDashboardData.ts:73 
+ GET http://localhost:3000/api/dashboard/enterprise 404 (Not Found)
+useDashboardData.useEffect.fetchData	@	useDashboardData.ts:73
+useDashboardData.useEffect	@	useDashboardData.ts:88
+"use client"		
+Promise.all	@	VM218 <anonymous>:1
+Promise.all	@	VM218 <anonymous>:1
+Promise.all	@	VM218 <anonymous>:1
+Promise.then		
+handleSubmit	@	page.tsx:53
+<Form>		
+LoginForm	@	page.tsx:89
+<LoginForm>		
+LoginPage	@	page.tsx:155
+"use client"		
+Promise.all	@	VM218 <anonymous>:1
+Promise.all	@	VM218 <anonymous>:1
+<LinkComponent>		
+PortalHeader	@	PortalHeader.tsx:32
+<PortalHeader>		
+HomePage	@	page.tsx:59
+"use client"		
+Promise.all	@	VM218 <anonymous>:1
+
+3.重新打开无痕浏览器，登录| 学校 | whu@school.com | school123 |
+依旧跳转http://localhost:3000/enterprise
+
+4.重新打开无痕浏览器，登录 管理员 | admin@wehan.com | admin123
+跳转http://localhost:3000/enterprise
+
+5.重新打开无痕浏览器，登录 | 政府 | gov@wuhan.gov.cn | government123 |
+依旧跳转http://localhost:3000/enterprise
+
+
+## 018 完整测试
+
+1.登录 学校 | whu@school.com | school123 |
+正确跳转http://localhost:3000/school
+进入首页后，就业看板、岗位推送、学生管理页面都能正常跳转，无报错。
+首页展示了毕业生总数、已就业数、就业率、有焊率，这些都有真实的数字。但在学生管理里面没有真实的信息，这个数字是否是前端填入的
+且首页提示有最近的岗位推送，给出了 3 个岗位。然后点击“推送岗位”，点击“岗位推送”跳转到岗位推送页面，岗位推送页面为空。
+学生管理页面信息也为空。
+还有就是学校页面、登录页面似乎没有这个验证学校信息的逻辑。因为账号是你直接给我注册好的，我不确定这个逻辑是否存在。
+我尝试点击右上角头像，个人信息跳转到http://localhost:3000/school/profile
+该页面报错 404
+然后测试退出登录功能，成功退出账号
+
+
+2.登录 | 政府 | gov@wuhan.gov.cn | government123 |
+跳转http://localhost:3000/government
+首页展示留汉指数，其中有 4 个仪表盘，前两个仪表盘为完全空白，第三个仪表盘为流汗率，第四个仪表盘为参加企业，这两个是有数据的
+下面是热门行业分布，依次排列的是互联网、金融、制造、教育、医疗
+右侧是由高校排名，分别是武汉大学、华中科技大学、武汉理工、华中师范、中国地质
+
+点击左侧政策管理，会有提示获取政策列表失败
+
+点击数据统计，里面有总投递数、今日投递、面试总数、留汉率，当前这些信息均为 0
+
+底下有留汉趋势图，目前也都是 0，都是在 X 轴上，是以月度为统计的
+
+然后在右边是行业分布，目前能看到互联网、云计算、智能制造这 3 个行业
+
+在数据统计这个页面停留时http://localhost:3000/government/statistics
+我每次切到其他的页面，比如说我现在进入了 VS Code，我在切回到这个网页中时，它就会对这个页面的信息进行一次刷新。希望你确认一下这个刷新的节点是什么，而且它当前这个刷新是否正常，也是需要判断的
+。
+我尝试点击右上角头像，个人信息跳转到http://localhost:3000/government/profile
+该页面报错 404
+然后测试退出登录功能，成功退出账号
+
+3.针对以上两种登录方式，它的一个通病就是右上角头像的个人信息页是没有完成的。我们先要讨论规划好个人信息页，它承载的信息是什么，我的想法是在账号进行注册时，它会填入一些信息，比如政府机关是什么、学校是什么。那么我们就把这些信息展示在他的个人信息页里，同时需要界定哪些信息是他可以修改的，哪些信息是不允许他修改的
+
+
+4.登录 | 管理员 | admin@wehan.com | admin123 |
+跳转http://localhost:3000/admin
+缺少个人信息页面功能http://localhost:3000/admin/profile
+缺少政策管理页面功能http://localhost:3000/admin/policies
+缺少岗位管理页面功能http://localhost:3000/admin/jobs
+访问均是404
+其他页面访问都正常，各页面下的功能点还没有进行测试
+
+
+## 019 
+出现了严重bug，我先登录了管理员账号，进行了页面测试，当测试完成后，我点击右上角的退出。然后我登录了企业端账号。
+依旧进入了http://localhost:3000/admin
+且右上角身份为武汉市人才服务中心 
+进入个人中心 http://localhost:3000/admin/profile 
+展示武汉市人才服务中心 为系统管理员
+你在同一个页面下登录不同账号，它们的缓存信息是否会影响你下一次的登录？为什么会出现这种情况，登录账号跳转到不同的页面，它的逻辑是怎样的，如果我拿一个公司账号登录学校页面，是否应该直接不允许他登录，是不是要增加一个兜底的逻辑？
+
+## 020
+登录报错
+hot-reloader-pages.ts:136 控制台数据已被清除
+pages-dev-overlay-setup.tsx:85 ./src/components/layout/DashboardLayout.tsx:38:3
+Parsing ecmascript source code failed
+  36 |   }
+  37 |
+> 38 |   return (
+     |   ^^^^^^^^
+> 39 |     <Layout className="min-h-screen">
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 40 |       {/* 侧边栏 */}
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 41 |       <DashboardSider
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 42 |         role={role}
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 43 |         collapsed={collapsed}
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 44 |       />
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 45 |
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 46 |       {/* 主内容区 */}
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 47 |       <Layout>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 48 |         {/* 头部 */}
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 49 |         <DashboardHeader
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 50 |           role={role}
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 51 |           collapsed={collapsed}
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 52 |           onToggle={() => setCollapsed(!collapsed)}
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 53 |           userName={userName}
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 54 |         />
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 55 |
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 56 |         {/* 内容 */}
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 57 |         <Content
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 58 |           className="m-6 p-6"
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 59 |           style={{
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 60 |             background: colorBgContainer,
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 61 |             borderRadius: borderRadiusLG,
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 62 |             minHeight: 280,
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 63 |           }}
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 64 |         >
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 65 |           {children}
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 66 |         </Content>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 67 |       </Layout>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 68 |     </Layout>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |   )
+     | ^^^^
+  70 | }
+  71 |
+
+Return statement is not allowed here
+
+Import traces:
+  Client Component Browser:
+    ./src/components/layout/DashboardLayout.tsx [Client Component Browser]
+    ./src/app/(dashboard)/admin/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/admin/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/layout/DashboardLayout.tsx [Client Component SSR]
+    ./src/app/(dashboard)/admin/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/admin/page.tsx [Server Component]
+nextJsHandleConsoleError @ pages-dev-overlay-setup.tsx:85
+handleErrors @ hot-reloader-pages.ts:229
+processMessage @ hot-reloader-pages.ts:318
+（匿名） @ hot-reloader-pages.ts:100
+handleMessage @ websocket.ts:68

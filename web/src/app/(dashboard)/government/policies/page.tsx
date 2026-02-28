@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
 import {
-  Card, Table, Button, Space, Tag, Typography, Modal, message, Popconfirm, Tooltip, Badge, Spin
+  Card, Table, Button, Space, Tag, Typography, Modal, App, Popconfirm, Tooltip, Badge, Spin
 } from 'antd'
 import {
   PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined,
@@ -38,6 +38,7 @@ const POLICY_TYPE_LABELS: Record<PolicyType, { label: string; color: string }> =
 export default function PoliciesPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const { message } = App.useApp()
   const [policies, setPolicies] = useState<Policy[]>([])
   const [loading, setLoading] = useState(false)
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 })
@@ -49,6 +50,7 @@ export default function PoliciesPage() {
       const params = new URLSearchParams({
         page: String(page),
         pageSize: String(pageSize),
+        includeInactive: 'true', // 包含已下架的政策
       })
       if (type) params.append('type', type)
 

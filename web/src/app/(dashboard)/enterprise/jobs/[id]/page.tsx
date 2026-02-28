@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import {
-  Card, Descriptions, Tag, Button, Space, Typography, Spin, Divider, Row, Col, Badge, Modal, message
+  Card, Descriptions, Tag, Button, Space, Typography, Spin, Divider, Row, Col, Badge, Modal, App
 } from 'antd'
 import {
   EditOutlined, DeleteOutlined, CheckCircleOutlined, StopOutlined, ArrowLeftOutlined
@@ -53,6 +53,7 @@ export default function JobDetailPage() {
   const router = useRouter()
   const params = useParams()
   const jobId = params?.id as string
+  const { message } = App.useApp()
 
   const [job, setJob] = useState<Job | null>(null)
   const [loading, setLoading] = useState(true)

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Typography, message, Spin, Result, Button } from 'antd'
+import { Typography, App, Spin, Result, Button } from 'antd'
 import { useRouter, useParams } from 'next/navigation'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import JobForm, { JobFormValues } from '@/components/jobs/JobForm'
@@ -31,6 +31,7 @@ export default function EditJobPage() {
   const router = useRouter()
   const params = useParams()
   const jobId = params?.id as string
+  const { message } = App.useApp()
 
   const [job, setJob] = useState<Job | null>(null)
   const [loading, setLoading] = useState(true)

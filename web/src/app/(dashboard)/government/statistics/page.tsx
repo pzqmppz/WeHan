@@ -1,15 +1,16 @@
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState } from 'react'
 import { Card, Row, Col, Statistic, Typography, Spin, DatePicker, Space } from 'antd'
 import {
-  UserOutlined, TeamOutlined, FileTextOutlined, CheckCircleOutlined,
+  TeamOutlined, FileTextOutlined, CheckCircleOutlined,
   RiseOutlined
 } from '@ant-design/icons'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { RetentionTrendChart, IndustryDistributionChart } from '@/components/charts'
+import useSWR from 'swr'
 import dayjs from 'dayjs'
 
 const { Title, Text } = Typography
@@ -35,44 +36,43 @@ interface IndustryData {
   count: number
 }
 
+// SWR fetcher
+const fetcher = async (url: string) => {
+  const res = await fetch(url)
+  return res.json()
+}
+
 export default function GovernmentStatisticsPage() {
-  const { data: session, status } = useSession()
+  const { status } = useSession()
   const router = useRouter()
-  const [loading, setLoading] = useState(false)
-  const [stats, setStats] = useState<GovernmentStats | null>(null)
-  const [trend, setTrend] = useState<TrendData[]>([])
-  const [industryDistribution, setIndustryDistribution] = useState<IndustryData[]>([])
   const [dateRange, setDateRange] = useState<[dayjs.Dayjs | null, dayjs.Dayjs | null] | null>(null)
 
-  const fetchData = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams()
-      if (dateRange?.[0] && dateRange?.[1]) {
-        params.append('startDate', dateRange[0].format('YYYY-MM-DD'))
-        params.append('endDate', dateRange[1].format('YYYY-MM-DD'))
-      }
-
-      const res = await fetch(`/api/statistics/government?${params}`)
-      const data = await res.json()
-
-      if (data.success) {
-        setStats(data.data.stats)
-        setTrend(data.data.trend)
-        setIndustryDistribution(data.data.industryDistribution)
-      }
-    } catch (error) {
-      console.error('Fetch statistics error:', error)
-    } finally {
-      setLoading(false)
+  // 构建请求 URL
+  const getApiUrl = () => {
+    const params = new URLSearchParams()
+    if (dateRange?.[0] && dateRange?.[1]) {
+      params.append('startDate', dateRange[0].format('YYYY-MM-DD'))
+      params.append('endDate', dateRange[1].format('YYYY-MM-DD'))
     }
-  }, [dateRange])
+    const queryString = params.toString()
+    return `/api/statistics/government${queryString ? `?${queryString}` : ''}`
+  }
 
-  useEffect(() => {
-    if (session) {
-      fetchData()
+  // 使用 SWR 获取数据（带缓存）
+  const { data, isLoading } = useSWR(
+    status === 'authenticated' ? getApiUrl() : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,    // 切换标签页不刷新
+      dedupingInterval: 60000,     // 60秒内相同请求不重复发送
+      refreshInterval: 0,          // 不自动刷新
     }
-  }, [session, fetchData])
+  )
+
+  const stats = data?.data?.stats as GovernmentStats | undefined
+  const trend = data?.data?.trend as TrendData[] | undefined
+  const industryDistribution = data?.data?.industryDistribution as IndustryData[] | undefined
+  const loading = isLoading && !data
 
   if (status === 'loading') {
     return (
@@ -151,10 +151,10 @@ export default function GovernmentStatisticsPage() {
 
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={16}>
-          <RetentionTrendChart data={trend} loading={loading} title="留汉趋势" />
+          <RetentionTrendChart data={trend || []} loading={loading} title="留汉趋势" />
         </Col>
         <Col xs={24} lg={8}>
-          <IndustryDistributionChart data={industryDistribution} loading={loading} title="行业分布" />
+          <IndustryDistributionChart data={industryDistribution || []} loading={loading} title="行业分布" />
         </Col>
       </Row>
     </DashboardLayout>

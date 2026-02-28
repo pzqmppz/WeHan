@@ -215,6 +215,10 @@ export async function DELETE(
 /**
  * PATCH /api/jobs/[id] - 更新岗位状态（发布/下架）
  * 需要认证 + 所有权验证
+ *
+ * 支持两种调用方式：
+ * 1. { action: 'publish' | 'close' } - 旧方式
+ * 2. { status: 'PUBLISHED' | 'CLOSED' } - 新方式
  */
 export async function PATCH(
   request: NextRequest,
@@ -245,17 +249,22 @@ export async function PATCH(
       )
     }
 
-    // 4. 执行状态更新
-    const { action } = body
-
+    // 4. 执行状态更新（支持两种方式）
+    const { action, status } = body
     let result
-    if (action === 'publish') {
+
+    // 优先使用 status 参数
+    if (status === 'PUBLISHED') {
+      result = await jobService.publishJob(validatedId)
+    } else if (status === 'CLOSED') {
+      result = await jobService.closeJob(validatedId)
+    } else if (action === 'publish') {
       result = await jobService.publishJob(validatedId)
     } else if (action === 'close') {
       result = await jobService.closeJob(validatedId)
     } else {
       return NextResponse.json(
-        { success: false, error: '无效的操作' },
+        { success: false, error: '无效的操作，请使用 action(publish/close) 或 status(PUBLISHED/CLOSED)' },
         { status: 400 }
       )
     }

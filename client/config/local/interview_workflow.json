@@ -1,0 +1,191 @@
+{
+  "version": "2.0",
+  "name": "WeHan 面试模拟工作流（支持断点恢复）",
+  "description": "从岗位JD生成面试题 → 语音对话 → 实时保存进度 → 生成评估报告",
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "config": {
+        "parameters": [
+          { "name": "job_id", "type": "string", "required": true, "description": "岗位ID" },
+          { "name": "user_id", "type": "string", "required": true, "description": "用户ID（externalUserId）" },
+          { "name": "resume_id", "type": "string", "required": false, "description": "简历ID（可选）" }
+        ]
+      },
+      "position": { "x": 100, "y": 100 }
+    },
+    {
+      "id": "check_resume",
+      "type": "http",
+      "config": {
+        "name": "获取用户简历",
+        "url": "${B_API_BASE_URL}/resumes?userId=${user_id}",
+        "method": "GET",
+        "headers": {
+          "X-API-Key": "${B_API_KEY}",
+          "Content-Type": "application/json"
+        },
+        "response_type": "json"
+      },
+      "position": { "x": 100, "y": 180 }
+    },
+    {
+      "id": "get_job_detail",
+      "type": "http",
+      "config": {
+        "name": "获取岗位详情",
+        "url": "${B_API_BASE_URL}/jobs/${job_id}",
+        "method": "GET",
+        "headers": {
+          "X-API-Key": "${B_API_KEY}",
+          "Content-Type": "application/json"
+        },
+        "response_type": "json"
+      },
+      "position": { "x": 100, "y": 260 }
+    },
+    {
+      "id": "generate_questions",
+      "type": "llm",
+      "config": {
+        "name": "生成面试题目",
+        "prompt": "你是专业的面试官。根据以下岗位JD和用户简历，生成8-12道面试题：\n\n【岗位信息】\n${get_job_detail.body}\n\n【用户简历】\n${check_resume.body}\n\n要求：\n1. 题目难度适中，适合应届生\n2. 涵盖专业知识(40%)、项目经验(30%)、软技能(30%)\n3. 如果有简历，问题需贴合用户经历\n4. 输出JSON格式：\n{\"questions\": [{\"id\": 1, \"question\": \"题目内容\", \"category\": \"专业知识\", \"weight\": 10}]}"
+      },
+      "position": { "x": 100, "y": 340 }
+    },
+    {
+      "id": "create_interview",
+      "type": "http",
+      "config": {
+        "name": "创建面试记录",
+        "url": "${B_API_BASE_URL}/interviews",
+        "method": "POST",
+        "headers": {
+          "X-API-Key": "${B_API_KEY}",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "externalUserId": "${user_id}",
+          "jobId": "${job_id}",
+          "status": "IN_PROGRESS",
+          "outline": "${generate_questions.body.questions}",
+          "currentIndex": 0,
+          "answers": []
+        }
+      },
+      "position": { "x": 100, "y": 420 }
+    },
+    {
+      "id": "voice_interview",
+      "type": "interaction",
+      "config": {
+        "name": "语音面试交互",
+        "connector_id": "${CONNECTOR_ID}",
+        "voice_id": "${VOICE_ID}",
+        "input_audio": {
+          "format": "pcm",
+          "sample_rate": 24000,
+          "channel": 1
+        },
+        "turn_detection": {
+          "type": "semantic_vad",
+          "semantic_vad_config": {
+            "silence_threshold_ms": 300
+          }
+        },
+        "context": {
+          "interview_id": "${create_interview.body.id}",
+          "questions": "${generate_questions.body.questions}",
+          "resume": "${check_resume.body}"
+        }
+      },
+      "position": { "x": 100, "y": 500 }
+    },
+    {
+      "id": "save_progress",
+      "type": "http",
+      "config": {
+        "name": "保存面试进度（每题保存）",
+        "url": "${B_API_BASE_URL}/interviews/${create_interview.body.id}",
+        "method": "PATCH",
+        "headers": {
+          "X-API-Key": "${B_API_KEY}",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "currentIndex": "${voice_interview.currentIndex}",
+          "answers": "${voice_interview.answers}",
+          "duration": "${voice_interview.duration}"
+        }
+      },
+      "position": { "x": 100, "y": 580 }
+    },
+    {
+      "id": "generate_report",
+      "type": "llm",
+      "config": {
+        "name": "生成评估报告",
+        "prompt": "你是专业的面试评估官。根据以下面试记录，生成评估报告：\n\n【面试题目】\n${generate_questions.body.questions}\n\n【用户回答】\n${voice_interview.answers}\n\n输出JSON格式：\n{\n  \"totalScore\": 85,\n  \"dimensions\": [\n    {\"name\": \"专业知识\", \"score\": 90, \"maxScore\": 100, \"comment\": \"评价\"},\n    {\"name\": \"表达能力\", \"score\": 80, \"maxScore\": 100, \"comment\": \"评价\"},\n    {\"name\": \"逻辑思维\", \"score\": 85, \"maxScore\": 100, \"comment\": \"评价\"},\n    {\"name\": \"应变能力\", \"score\": 82, \"maxScore\": 100, \"comment\": \"评价\"}\n  ],\n  \"highlights\": [{\"question\": \"题目\", \"answer\": \"回答摘要\", \"score\": 90}],\n  \"improvements\": [{\"area\": \"改进领域\", \"suggestion\": \"具体建议\"}],\n  \"suggestions\": \"整体表现良好，建议加强...\"\n}"
+      },
+      "position": { "x": 100, "y": 660 }
+    },
+    {
+      "id": "save_final_report",
+      "type": "http",
+      "config": {
+        "name": "保存最终报告",
+        "url": "${B_API_BASE_URL}/interviews/${create_interview.body.id}",
+        "method": "PATCH",
+        "headers": {
+          "X-API-Key": "${B_API_KEY}",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "status": "COMPLETED",
+          "totalScore": "${generate_report.body.totalScore}",
+          "dimensions": "${generate_report.body.dimensions}",
+          "highlights": "${generate_report.body.highlights}",
+          "improvements": "${generate_report.body.improvements}",
+          "suggestions": "${generate_report.body.suggestions}"
+        }
+      },
+      "position": { "x": 100, "y": 740 }
+    },
+    {
+      "id": "end",
+      "type": "end",
+      "config": {
+        "outputs": [
+          { "name": "interview_id", "value": "${create_interview.body.id}" },
+          { "name": "interview_report", "value": "${generate_report.body}" }
+        ]
+      },
+      "position": { "x": 100, "y": 820 }
+    }
+  ],
+  "edges": [
+    { "source": "start", "target": "check_resume" },
+    { "source": "check_resume", "target": "get_job_detail" },
+    { "source": "get_job_detail", "target": "generate_questions" },
+    { "source": "generate_questions", "target": "create_interview" },
+    { "source": "create_interview", "target": "voice_interview" },
+    { "source": "voice_interview", "target": "save_progress" },
+    { "source": "save_progress", "target": "generate_report" },
+    { "source": "generate_report", "target": "save_final_report" },
+    { "source": "save_final_report", "target": "end" }
+  ],
+  "input_parameters": [
+    { "name": "job_id", "type": "string", "description": "岗位ID" },
+    { "name": "user_id", "type": "string", "description": "用户ID（externalUserId）" },
+    { "name": "resume_id", "type": "string", "description": "简历ID（可选）" }
+  ],
+  "output_parameters": [
+    { "name": "interview_id", "type": "string", "description": "面试记录ID" },
+    { "name": "interview_report", "type": "object", "description": "完整评估报告" }
+  ],
+  "notes": {
+    "断点恢复": "如果面试中断，用户再次进入时，先调用 GET /api/open/interviews?userId=xxx&status=IN_PROGRESS 查询进行中的面试，获取 interview_id、currentIndex、outline、answers，然后从断点继续",
+    "手动配置": "此工作流配置需要在 Coze 网页平台手动创建，API 不可用"
+  }
+}

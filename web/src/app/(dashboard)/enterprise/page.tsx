@@ -12,10 +12,12 @@ import {
 } from '@ant-design/icons'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { useEnterpriseDashboard } from '@/hooks'
+import { useRouter } from 'next/navigation'
 
 const { Title, Text } = Typography
 
 export default function EnterpriseDashboard() {
+  const router = useRouter()
   const { data, loading, error, refetch } = useEnterpriseDashboard()
 
   if (loading) {
@@ -142,7 +144,12 @@ export default function EnterpriseDashboard() {
           <Card
             title="热门岗位"
             extra={
-              <Button type="primary" icon={<PlusOutlined />} size="small">
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                size="small"
+                onClick={() => router.push('/enterprise/jobs/create')}
+              >
                 发布岗位
               </Button>
             }

@@ -1,61 +1,23 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import {
-  Card, Descriptions, Tag, Button, Space, Typography, Spin, Divider, Row, Col, Avatar, Timeline, Modal, message, Tabs
+  Card, Descriptions, Tag, Button, Space, Typography, Spin, Row, Col, Avatar, Timeline, Modal
 } from 'antd'
 import {
-  ArrowLeftOutlined, CheckCircleOutlined, CloseCircleOutlined, CalendarOutlined,
-  MailOutlined, PhoneOutlined, UserOutlined, FileTextOutlined
+  ArrowLeftOutlined, MailOutlined, PhoneOutlined, UserOutlined
 } from '@ant-design/icons'
 import { useRouter, useParams } from 'next/navigation'
 import DashboardLayout from '@/components/layout/DashboardLayout'
+import { useApplicationDetail } from '@/hooks/useApplicationDetail'
+import {
+  ApplicationStatusActions,
+  ApplicationResumeCard,
+  ApplicationInterviewCard,
+} from '@/components/applications'
 
 const { Title, Text, Paragraph } = Typography
 const { Item: TimelineItem } = Timeline
-
-interface Application {
-  id: string
-  status: string
-  matchScore: number | null
-  notes: string | null
-  createdAt: string
-  updatedAt: string
-  User: {
-    id: string
-    name: string
-    email: string
-    phone?: string
-    school?: { name: string }
-    major?: string
-    graduationYear?: number
-  }
-  Job: {
-    id: string
-    title: string
-    location: string | null
-    salaryMin: number | null
-    salaryMax: number | null
-    Enterprise: { name: string }
-  }
-  resume?: {
-    id: string
-    phone?: string
-    email?: string
-    education?: any[]
-    experiences?: any[]
-    projects?: any[]
-    skills: string[]
-  }
-  Interview?: {
-    id: string
-    totalScore: number | null
-    dimensions?: any[]
-    suggestions?: string
-    status: string
-    createdAt: string
-  }
-}
 
 const APPLICATION_STATUS_CONFIG: Record<string, { color: string; label: string }> = {
   PENDING: { color: 'processing', label: '待处理' },
@@ -71,54 +33,20 @@ export default function ApplicationDetailPage() {
   const params = useParams()
   const applicationId = params?.id as string
 
-  const [application, setApplication] = useState<Application | null>(null)
-  const [loading, setLoading] = useState(true)
+  const { application, loading, updateStatus, updateNotes } = useApplicationDetail(applicationId)
 
-  useEffect(() => {
-    if (applicationId) {
-      fetchApplication()
-    }
-  }, [applicationId])
-
-  const fetchApplication = async () => {
-    setLoading(true)
-    try {
-      const res = await fetch(`/api/applications/${applicationId}`)
-      const data = await res.json()
-
-      if (data.success) {
-        setApplication(data.data)
-      } else {
-        message.error('投递记录不存在')
-        router.push('/enterprise/applications')
-      }
-    } catch (error) {
-      console.error('Fetch application error:', error)
-      message.error('加载失败')
-      router.push('/enterprise/applications')
-    } finally {
-      setLoading(false)
-    }
+  const formatSalary = () => {
+    if (!application?.Job.salaryMin && !application?.Job.salaryMax) return '面议'
+    const min = application?.Job.salaryMin ? `${(application.Job.salaryMin / 1000).toFixed(0)}K` : ''
+    const max = application?.Job.salaryMax ? `${(application.Job.salaryMax / 1000).toFixed(0)}K` : ''
+    return min && max ? `${min}-${max}` : min || max
   }
 
-  const handleUpdateStatus = async (newStatus: string) => {
-    try {
-      const res = await fetch(`/api/applications/${applicationId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus }),
-      })
-      const data = await res.json()
-
-      if (data.success) {
-        message.success('状态已更新')
-        setApplication(data.data)
-      } else {
-        message.error(data.error || '更新失败')
-      }
-    } catch (error) {
-      message.error('更新失败')
-    }
+  const formatMatchScore = (score: number | null) => {
+    if (score === null) return '未评估'
+    if (score >= 80) return <Tag color="success">{score}分 - 优秀</Tag>
+    if (score >= 60) return <Tag color="warning">{score}分 - 良好</Tag>
+    return <Tag color="error">{score}分 - 一般</Tag>
   }
 
   const showNotesModal = () => {
@@ -135,44 +63,11 @@ export default function ApplicationDetailPage() {
       ),
       onOk: async () => {
         const notes = (document.getElementById('notes-input') as HTMLTextAreaElement)?.value
-        try {
-          const res = await fetch(`/api/applications/${applicationId}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ notes }),
-          })
-          const data = await res.json()
-
-          if (data.success) {
-            message.success('备注已保存')
-            setApplication(data.data)
-          } else {
-            message.error(data.error || '保存失败')
-          }
-        } catch (error) {
-          message.error('保存失败')
-        }
+        await updateNotes(notes)
       },
     })
   }
 
-  // 格式化薪资
-  const formatSalary = () => {
-    if (!application?.Job.salaryMin && !application?.Job.salaryMax) return '面议'
-    const min = application?.Job.salaryMin ? `${(application.Job.salaryMin / 1000).toFixed(0)}K` : ''
-    const max = application?.Job.salaryMax ? `${(application.Job.salaryMax / 1000).toFixed(0)}K` : ''
-    return min && max ? `${min}-${max}` : min || max
-  }
-
-  // 格式化匹配分数
-  const formatMatchScore = (score: number | null) => {
-    if (score === null) return '未评估'
-    if (score >= 80) return <Tag color="success">{score}分 - 优秀</Tag>
-    if (score >= 60) return <Tag color="warning">{score}分 - 良好</Tag>
-    return <Tag color="error">{score}分 - 一般</Tag>
-  }
-
-  // 获取状态时间线
   const getStatusTimeline = () => {
     const items = [
       { status: 'PENDING', label: '投递', time: application?.createdAt },
@@ -236,41 +131,11 @@ export default function ApplicationDetailPage() {
           </div>
         </div>
 
-        <Space>
-          {application.status === 'PENDING' && (
-            <>
-              <Button type="primary" icon={<CheckCircleOutlined />} onClick={() => handleUpdateStatus('VIEWED')}>
-                标记已查看
-              </Button>
-              <Button danger icon={<CloseCircleOutlined />} onClick={() => handleUpdateStatus('REJECTED')}>
-                拒绝
-              </Button>
-            </>
-          )}
-          {application.status === 'VIEWED' && (
-            <>
-              <Button type="primary" icon={<CalendarOutlined />} onClick={() => handleUpdateStatus('INTERVIEWING')}>
-                安排面试
-              </Button>
-              <Button danger icon={<CloseCircleOutlined />} onClick={() => handleUpdateStatus('REJECTED')}>
-                拒绝
-              </Button>
-            </>
-          )}
-          {application.status === 'INTERVIEWING' && (
-            <>
-              <Button type="primary" style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }} icon={<CheckCircleOutlined />} onClick={() => handleUpdateStatus('OFFERED')}>
-                发送录用
-              </Button>
-              <Button danger icon={<CloseCircleOutlined />} onClick={() => handleUpdateStatus('REJECTED')}>
-                拒绝
-              </Button>
-            </>
-          )}
-          <Button onClick={showNotesModal}>
-            添加备注
-          </Button>
-        </Space>
+        <ApplicationStatusActions
+          status={application.status}
+          onUpdateStatus={updateStatus}
+          onAddNotes={showNotesModal}
+        />
       </div>
 
       <Row gutter={24}>
@@ -312,85 +177,12 @@ export default function ApplicationDetailPage() {
 
           {/* 简历详情 */}
           {application.resume && (
-            <Card title="简历详情" className="mb-4">
-              <Tabs defaultActiveKey="education">
-                <Tabs.TabPane tab="教育经历" key="education">
-                  {application.resume.education && Array.isArray(application.resume.education) ? (
-                    <div className="space-y-4">
-                      {application.resume.education.map((edu: any, idx: number) => (
-                        <div key={idx} className="border-b pb-3 last:border-b-0">
-                          <Text strong>{edu.school}</Text>
-                          <br />
-                          <Text type="secondary">
-                            {edu.major} · {edu.degree} · {edu.startDate} - {edu.endDate || '至今'}
-                          </Text>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <Text type="secondary">暂无教育经历</Text>
-                  )}
-                </Tabs.TabPane>
-                <Tabs.TabPane tab="工作经历" key="experiences">
-                  {application.resume.experiences && Array.isArray(application.resume.experiences) ? (
-                    <div className="space-y-4">
-                      {application.resume.experiences.map((exp: any, idx: number) => (
-                        <div key={idx} className="border-b pb-3 last:border-b-0">
-                          <Text strong>{exp.company}</Text>
-                          <Text type="secondary" className="ml-2">{exp.position}</Text>
-                          <br />
-                          <Text type="secondary" className="text-xs">
-                            {exp.startDate} - {exp.endDate || '至今'}
-                          </Text>
-                          {exp.description && (
-                            <Paragraph className="mt-2 mb-0 text-sm" type="secondary">
-                              {exp.description}
-                            </Paragraph>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <Text type="secondary">暂无工作经历</Text>
-                  )}
-                </Tabs.TabPane>
-                <Tabs.TabPane tab="技能标签" key="skills">
-                  <div className="flex flex-wrap gap-2">
-                    {application.resume.skills?.length > 0 ? (
-                      application.resume.skills.map((skill, idx) => (
-                        <Tag key={idx} color="blue">{skill}</Tag>
-                      ))
-                    ) : (
-                      <Text type="secondary">暂无技能标签</Text>
-                    )}
-                  </div>
-                </Tabs.TabPane>
-              </Tabs>
-            </Card>
+            <ApplicationResumeCard resume={application.resume} />
           )}
 
           {/* 面试报告 */}
           {application.Interview && (
-            <Card title="AI 面试报告" className="mb-4">
-              <Descriptions column={1} bordered size="small">
-                <Descriptions.Item label="综合评分">
-                  {formatMatchScore(application.Interview.totalScore)}
-                </Descriptions.Item>
-                {application.Interview.dimensions?.map((dim: any, idx: number) => (
-                  <Descriptions.Item key={idx} label={dim.name}>
-                    <Space>
-                      <Text>{dim.score}/{dim.maxScore}</Text>
-                      {dim.comment && <Text type="secondary">({dim.comment})</Text>}
-                    </Space>
-                  </Descriptions.Item>
-                ))}
-                {application.Interview.suggestions && (
-                  <Descriptions.Item label="改进建议">
-                    <Paragraph className="mb-0">{application.Interview.suggestions}</Paragraph>
-                  </Descriptions.Item>
-                )}
-              </Descriptions>
-            </Card>
+            <ApplicationInterviewCard interview={application.Interview} />
           )}
         </Col>
 

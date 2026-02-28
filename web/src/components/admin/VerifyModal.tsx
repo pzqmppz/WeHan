@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { Modal, Form, Input, Radio, message } from 'antd'
+import { Modal, Form, Input, Radio, App } from 'antd'
 
 interface VerifyModalProps {
   open: boolean
@@ -18,6 +18,7 @@ export default function VerifyModal({
   onCancel,
   loading = false,
 }: VerifyModalProps) {
+  const { message } = App.useApp()
   const [form] = Form.useForm()
   const [verified, setVerified] = React.useState<boolean | null>(null)
 

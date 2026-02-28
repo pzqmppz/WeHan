@@ -30,14 +30,21 @@ export async function GET(request: NextRequest) {
       location: searchParams.get('location') || undefined,
       keyword: searchParams.get('keyword') || undefined,
       enterpriseId: searchParams.get('enterpriseId') || undefined,
+      status: searchParams.get('status') || undefined,
+      all: searchParams.get('all') || undefined,
     })
+
+    // 如果不是管理员或者没有明确指定 all，则只返回当前用户企业的岗位
+    if ((!query.all || user.role !== 'ADMIN') && user.enterpriseId) {
+      query.enterpriseId = user.enterpriseId
+    }
 
     const result = await jobService.getJobs(query)
 
     return NextResponse.json({
       success: true,
       data: result.data,
-      meta: result.pagination,
+      pagination: result.pagination,
     })
   } catch (error) {
     console.error('Get jobs error:', error)

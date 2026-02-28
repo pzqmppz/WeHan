@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Card, Typography, message, Spin } from 'antd'
+import { Card, Typography, Spin, App } from 'antd'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import DashboardLayout from '@/components/layout/DashboardLayout'
@@ -14,6 +14,7 @@ export default function CreatePolicyPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const { message } = App.useApp()
 
   const handleSubmit = async (values: PolicyFormValues) => {
     setLoading(true)

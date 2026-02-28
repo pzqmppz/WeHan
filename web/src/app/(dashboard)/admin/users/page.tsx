@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
 import {
-  Card, Table, Button, Space, Tag, Typography, message, Popconfirm, Tooltip, Spin
+  Card, Table, Button, Space, Tag, Typography, App, Popconfirm, Tooltip, Spin
 } from 'antd'
 import { ReloadOutlined, StopOutlined, CheckCircleOutlined } from '@ant-design/icons'
 import DashboardLayout from '@/components/layout/DashboardLayout'
@@ -43,6 +43,7 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
 export default function AdminUsersPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const { message } = App.useApp()
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(false)
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 })

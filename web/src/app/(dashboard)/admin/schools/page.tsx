@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
 import {
-  Card, Table, Button, Space, Tag, Typography, message, Tooltip, Spin
+  Card, Table, Button, Space, Tag, Typography, App, Tooltip, Spin
 } from 'antd'
 import { ReloadOutlined, CheckCircleOutlined, EyeOutlined } from '@ant-design/icons'
 import DashboardLayout from '@/components/layout/DashboardLayout'
@@ -28,6 +28,7 @@ interface School {
 export default function AdminSchoolsPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const { message } = App.useApp()
   const [schools, setSchools] = useState<School[]>([])
   const [loading, setLoading] = useState(false)
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 })

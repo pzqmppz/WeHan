@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { Layout, Row, Col, Card, Statistic, Button, Typography, Space, Carousel } from 'antd'
+import { Layout, Row, Col, Card, Statistic, Button, Typography, Space, Spin, Tag } from 'antd'
 import {
   TeamOutlined,
   BankOutlined,
@@ -11,49 +11,64 @@ import {
   SafetyCertificateOutlined,
   RocketOutlined,
   HeartOutlined,
+  StarOutlined,
+  TrophyOutlined,
+  FileTextOutlined,
+  BulbOutlined,
+  ThunderboltOutlined,
 } from '@ant-design/icons'
 import { PortalHeader, PortalFooter } from '@/components/layout'
+import { useHomepageConfig } from '@/hooks/useHomepageConfig'
+import { usePolicies } from '@/hooks/usePolicies'
 
 const { Content } = Layout
 const { Title, Paragraph, Text } = Typography
 
-const stats = [
-  { title: '入驻企业', value: 120, suffix: '家' },
-  { title: '合作高校', value: 35, suffix: '所' },
-  { title: '服务学生', value: 15000, suffix: '人' },
-  { title: '留汉率', value: 68, suffix: '%' },
-]
+// 图标映射
+const ICON_MAP: Record<string, React.ReactNode> = {
+  RocketOutlined: <RocketOutlined className="text-4xl text-primary" />,
+  BankOutlined: <BankOutlined className="text-4xl text-primary" />,
+  HeartOutlined: <HeartOutlined className="text-4xl text-primary" />,
+  SafetyCertificateOutlined: <SafetyCertificateOutlined className="text-4xl text-primary" />,
+  TeamOutlined: <TeamOutlined className="text-4xl text-primary" />,
+  FileTextOutlined: <FileTextOutlined className="text-4xl text-primary" />,
+  TrophyOutlined: <TrophyOutlined className="text-4xl text-primary" />,
+  StarOutlined: <StarOutlined className="text-4xl text-primary" />,
+  BulbOutlined: <BulbOutlined className="text-4xl text-primary" />,
+  ThunderboltOutlined: <ThunderboltOutlined className="text-4xl text-primary" />,
+}
 
-const features = [
-  {
-    icon: <RocketOutlined className="text-4xl text-primary" />,
-    title: 'AI求职助手',
-    description: '智能简历解析、AI模拟面试、个性化评估报告，提升求职竞争力',
-  },
-  {
-    icon: <BankOutlined className="text-4xl text-primary" />,
-    title: '本地岗位精准匹配',
-    description: '汇聚武汉优质企业岗位，基于画像智能推荐，找到最适合你的工作',
-  },
-  {
-    icon: <HeartOutlined className="text-4xl text-primary" />,
-    title: '心理健康关怀',
-    description: '求职焦虑疏导、情绪记录追踪，陪伴你度过求职季',
-  },
-  {
-    icon: <SafetyCertificateOutlined className="text-4xl text-primary" />,
-    title: '政策一键触达',
-    description: '人才补贴、住房优惠、创业扶持，武汉人才政策一站掌握',
-  },
-]
-
-const policies = [
-  { title: '武汉市大学生落户政策', tag: '热门' },
-  { title: '高校毕业生住房补贴申请指南', tag: '新发布' },
-  { title: '2026年武汉人才引进计划', tag: '' },
-]
+// 政策类型名称
+const TYPE_NAMES: Record<string, string> = {
+  TALENT: '人才政策',
+  HOUSING: '住房政策',
+  ENTREPRENEURSHIP: '创业扶持',
+  EMPLOYMENT: '就业政策',
+  OTHER: '其他',
+}
 
 export default function HomePage() {
+  const { config, loading } = useHomepageConfig()
+  const { policies, loading: policiesLoading } = usePolicies({ pageSize: 5 })
+
+  // 从配置中获取统计数据
+  const stats = [
+    { title: '入驻企业', value: config.stats.enterprises, suffix: '家' },
+    { title: '合作高校', value: config.stats.universities, suffix: '所' },
+    { title: '服务学生', value: config.stats.students, suffix: '人' },
+    { title: '留汉率', value: config.stats.retentionRate, suffix: '%' },
+  ]
+
+  // 从配置中获取功能特性，过滤启用的并按排序排列
+  const features = config.features
+    .filter(f => f.enabled)
+    .sort((a, b) => a.order - b.order)
+    .map(feature => ({
+      icon: ICON_MAP[feature.icon] || <StarOutlined className="text-4xl text-primary" />,
+      title: feature.title,
+      description: feature.description,
+    }))
+
   return (
     <Layout className="min-h-screen">
       <PortalHeader />
@@ -90,18 +105,24 @@ export default function HomePage() {
               <Col xs={24} md={10} className="hidden md:block">
                 <div className="bg-white/10 rounded-2xl p-8 backdrop-blur">
                   <Title level={4} className="!text-white !mb-4">平台数据</Title>
-                  <Row gutter={[16, 16]}>
-                    {stats.map((stat) => (
-                      <Col span={12} key={stat.title}>
-                        <Statistic
-                          title={<span className="text-white/80">{stat.title}</span>}
-                          value={stat.value}
-                          suffix={stat.suffix}
-                          valueStyle={{ color: '#fff' }}
-                        />
-                      </Col>
-                    ))}
-                  </Row>
+                  {loading ? (
+                    <div className="flex justify-center py-8">
+                      <Spin />
+                    </div>
+                  ) : (
+                    <Row gutter={[16, 16]}>
+                      {stats.map((stat) => (
+                        <Col span={12} key={stat.title}>
+                          <Statistic
+                            title={<span className="text-white/80">{stat.title}</span>}
+                            value={stat.value}
+                            suffix={stat.suffix}
+                            valueStyle={{ color: '#fff' }}
+                          />
+                        </Col>
+                      ))}
+                    </Row>
+                  )}
                 </div>
               </Col>
             </Row>
@@ -114,17 +135,23 @@ export default function HomePage() {
             <Title level={2} className="text-center mb-12">
               为什么选择才聚江城
             </Title>
-            <Row gutter={[24, 24]}>
-              {features.map((feature) => (
-                <Col xs={24} sm={12} lg={6} key={feature.title}>
-                  <Card className="h-full text-center hover:shadow-lg transition-shadow">
-                    <div className="mb-4">{feature.icon}</div>
-                    <Title level={4} className="!mb-2">{feature.title}</Title>
-                    <Text type="secondary">{feature.description}</Text>
-                  </Card>
-                </Col>
-              ))}
-            </Row>
+            {loading ? (
+              <div className="flex justify-center py-12">
+                <Spin size="large" />
+              </div>
+            ) : (
+              <Row gutter={[24, 24]}>
+                {features.map((feature) => (
+                  <Col xs={24} sm={12} lg={6} key={feature.title}>
+                    <Card className="h-full text-center hover:shadow-lg transition-shadow">
+                      <div className="mb-4">{feature.icon}</div>
+                      <Title level={4} className="!mb-2">{feature.title}</Title>
+                      <Text type="secondary">{feature.description}</Text>
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+            )}
           </div>
         </div>
 
@@ -134,22 +161,29 @@ export default function HomePage() {
             <Row gutter={48}>
               <Col xs={24} md={12}>
                 <Title level={3} className="mb-6">最新人才政策</Title>
-                <Space direction="vertical" className="w-full" size="middle">
-                  {policies.map((policy) => (
-                    <Card
-                      key={policy.title}
-                      className="cursor-pointer hover:shadow-md transition-shadow"
-                      size="small"
-                    >
-                      <div className="flex justify-between items-center">
-                        <span>{policy.title}</span>
-                        {policy.tag && (
-                          <Text type="danger" className="text-xs">{policy.tag}</Text>
-                        )}
-                      </div>
-                    </Card>
-                  ))}
-                </Space>
+                {policiesLoading ? (
+                  <div className="flex justify-center py-8">
+                    <Spin />
+                  </div>
+                ) : policies.length > 0 ? (
+                  <Space direction="vertical" className="w-full" size="middle">
+                    {policies.map((policy) => (
+                      <Link key={policy.id} href={`/policies/${policy.id}`}>
+                        <Card
+                          className="cursor-pointer hover:shadow-md transition-shadow"
+                          size="small"
+                        >
+                          <div className="flex justify-between items-center">
+                            <span>{policy.title}</span>
+                            <Tag color="blue">{TYPE_NAMES[policy.type] || '政策'}</Tag>
+                          </div>
+                        </Card>
+                      </Link>
+                    ))}
+                  </Space>
+                ) : (
+                  <Text type="secondary">暂无政策信息</Text>
+                )}
                 <Link href="/policies">
                   <Button type="link" className="mt-4 p-0">
                     查看全部政策 <ArrowRightOutlined />
@@ -206,7 +240,7 @@ export default function HomePage() {
         </div>
       </Content>
 
-      <PortalFooter />
+      <PortalFooter icpNumber={config.footerLinks.icpNumber} />
     </Layout>
   )
 }

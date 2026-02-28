@@ -1,0 +1,697 @@
+{
+  "type": "coze-workflow-clipboard-data",
+  "source": {
+    "workflowId": "",
+    "flowMode": 0,
+    "spaceId": "7491691397280874533",
+    "isDouyin": false,
+    "host": "www.coze.cn"
+  },
+  "bounds": {
+    "x": -3600,
+    "y": -400,
+    "width": 4200,
+    "height": 600
+  },
+  "json": {
+    "nodes": [
+      {
+        "id": "100001",
+        "type": "1",
+        "meta": { "position": { "x": -3400, "y": -200 } },
+        "data": {
+          "nodeMeta": {
+            "title": "开始",
+            "description": "工作流的起始节点，用于设定启动工作流需要的信息",
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-Start-v2.jpg",
+            "mainColor": "#5C62FF"
+          },
+          "outputs": [
+            { "type": "string", "name": "interview_id", "required": true },
+            { "type": "string", "name": "question_index", "required": true },
+            { "type": "string", "name": "user_answer", "required": true }
+          ],
+          "trigger_parameters": []
+        },
+        "_temp": {
+          "bounds": { "x": -3400, "y": -200, "width": 360, "height": 130 },
+          "externalData": {
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-Start-v2.jpg",
+            "description": "工作流的起始节点，用于设定启动工作流需要的信息",
+            "title": "开始",
+            "mainColor": "#5C62FF"
+          }
+        }
+      },
+      {
+        "id": "450001",
+        "type": "45",
+        "meta": { "position": { "x": -2900, "y": -200 } },
+        "data": {
+          "nodeMeta": {
+            "title": "HTTP_获取面试详情",
+            "mainColor": "#3071F2",
+            "subTitle": "HTTP 请求",
+            "description": "发送 HTTP 请求获取数据",
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-HTTP.png"
+          },
+          "inputParameters": [],
+          "inputs": {
+            "apiInfo": {
+              "method": "GET",
+              "url": "https://wehan-proxy.819264640.workers.dev/interviews/{{block_output_100001.interview_id}}"
+            },
+            "body": {
+              "bodyType": "EMPTY",
+              "bodyData": {
+                "binary": {
+                  "fileURL": {
+                    "type": "string",
+                    "value": {
+                      "type": "ref",
+                      "content": { "source": "block-output", "blockID": "", "name": "" }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": [
+              {
+                "name": "X-API-Key",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "literal",
+                    "content": "wehan_open_api_key_2026",
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              }
+            ],
+            "params": [],
+            "auth": {
+              "authType": "BEARER_AUTH",
+              "authData": { "customData": { "addTo": "header" } },
+              "authOpen": false
+            },
+            "setting": { "timeout": 60, "retryTimes": 2 },
+            "settingOnError": {}
+          },
+          "outputs": [
+            { "type": "string", "name": "body" },
+            { "type": "integer", "name": "statusCode" },
+            { "type": "string", "name": "headers" }
+          ]
+        },
+        "_temp": {
+          "bounds": { "x": -2900, "y": -200, "width": 360, "height": 200 },
+          "externalData": {
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-HTTP.png",
+            "description": "发送 HTTP 请求获取数据",
+            "title": "HTTP_获取面试详情"
+          }
+        }
+      },
+      {
+        "id": "590001",
+        "type": "59",
+        "meta": { "position": { "x": -2400, "y": -200 } },
+        "data": {
+          "nodeMeta": {
+            "title": "JSON反序列化",
+            "description": "将 JSON 字符串转换为对象",
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-JSONParse-v2.jpg",
+            "mainColor": "#F2B600"
+          },
+          "inputs": {
+            "inputParameters": [
+              {
+                "name": "jsonString",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "450001", "name": "body" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              }
+            ]
+          },
+          "outputs": [
+            { "type": "object", "name": "output", "schema": [] }
+          ]
+        },
+        "_temp": {
+          "bounds": { "x": -2400, "y": -200, "width": 360, "height": 120 },
+          "externalData": {
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-JSONParse-v2.jpg",
+            "description": "将 JSON 字符串转换为对象",
+            "title": "JSON反序列化"
+          }
+        }
+      },
+      {
+        "id": "300001",
+        "type": "3",
+        "meta": { "position": { "x": -1900, "y": -200 } },
+        "data": {
+          "nodeMeta": {
+            "title": "大模型_评估回答",
+            "description": "调用大语言模型处理文本",
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-LLM-v2.jpg",
+            "mainColor": "#00D4AA",
+            "subTitle": "大模型"
+          },
+          "inputs": {
+            "inputParameters": [
+              {
+                "name": "interviewData",
+                "input": {
+                  "type": "object",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "590001", "name": "output" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              },
+              {
+                "name": "questionIndex",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "100001", "name": "question_index" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              },
+              {
+                "name": "userAnswer",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "100001", "name": "user_answer" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              }
+            ],
+            "llmParam": [
+              {
+                "name": "prompt",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "literal",
+                    "content": "你是一位专业的面试官。请根据以下信息评估候选人的回答：\n\n【面试题目】\n{{current_question}}\n\n【候选人回答】\n{{user_answer}}\n\n【评估要点】\n{{evaluation_points}}\n\n请从以下维度进行评估（每项1-10分）：\n1. 专业能力：技术深度、知识准确性\n2. 表达能力：逻辑清晰度、语言流畅性\n\n请直接返回以下JSON格式（不要包含```json标记）：\n{\n  \"score\": 8,\n  \"feedback\": \"具体反馈意见\",\n  \"highlights\": \"回答中的亮点\",\n  \"improvements\": \"需要改进的地方\"\n}",
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              },
+              {
+                "name": "modleName",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "literal",
+                    "content": "doubao-pro-32k",
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              },
+              {
+                "name": "modelType",
+                "input": {
+                  "type": "integer",
+                  "value": { "type": "literal", "content": "0", "rawMeta": { "type": 2 } }
+                }
+              },
+              {
+                "name": "temperature",
+                "input": { "type": "float", "value": { "type": "literal", "content": "0.7", "rawMeta": { "type": 4 } }
+                }
+              },
+              {
+                "name": "maxTokens",
+                "input": { "type": "integer", "value": { "type": "literal", "content": "2048", "rawMeta": { "type": 2 } }
+                }
+              },
+              {
+                "name": "responseFormat",
+                "input": { "type": "integer", "value": { "type": "literal", "content": "2", "rawMeta": { "type": 2 } }
+                }
+              },
+              {
+                "name": "generationDiversity",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "literal",
+                    "content": "balance",
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              }
+            ],
+            "fcParamVar": { "knowledgeFCParam": {} },
+            "settingOnError": { "switch": false, "processType": 1, "timeoutMs": 180000, "retryTimes": 1 }
+          },
+          "outputs": [
+            { "type": "string", "name": "text" },
+            { "type": "string", "name": "text_str" }
+          ]
+        },
+        "_temp": {
+          "bounds": { "x": -1900, "y": -200, "width": 360, "height": 200 },
+          "externalData": {
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-LLM-v2.jpg",
+            "description": "调用大语言模型处理文本",
+            "title": "大模型_评估回答",
+            "mainColor": "#00D4AA"
+          }
+        }
+      },
+      {
+        "id": "500001",
+        "type": "5",
+        "meta": { "position": { "x": -1400, "y": -200 } },
+        "data": {
+          "nodeMeta": {
+            "title": "代码_解析评估结果",
+            "description": "执行 JavaScript/Python 代码处理数据",
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-Code-v2.jpg",
+            "mainColor": "#00B2B2",
+            "subTitle": ""
+          },
+          "inputs": {
+            "inputParameters": [
+              {
+                "name": "llmOutput",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "300001", "name": "text" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              },
+              {
+                "name": "interviewData",
+                "input": {
+                  "type": "object",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "590001", "name": "output" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              },
+              {
+                "name": "questionIndex",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "100001", "name": "question_index" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              }
+            ],
+            "code": "async function main({ params }: Args): Promise<Output> {\n  const llmOutput = params.llmOutput;\n  const interviewData = params.interviewData.data || params.interviewData;\n  const questionIndex = parseInt(params.questionIndex);\n  \n  let evaluation = { score: 5, feedback: \"回答收到了\", highlights: \"\", improvements: \"\" };\n  try {\n    let jsonStr = llmOutput;\n    const jsonMatch = llmOutput.match(/\\{[\\s\\S]*\\}/);\n    if (jsonMatch) {\n      jsonStr = jsonMatch[0];\n    }\n    evaluation = JSON.parse(jsonStr);\n  } catch (e) {\n    // 解析失败使用默认值\n  }\n  \n  const outline = interviewData.outline || [];\n  const currentQuestion = outline[questionIndex] || {};\n  \n  // 构建答案记录\n  const answerRecord = {\n    questionIndex: questionIndex,\n    question: currentQuestion.question || \"题目\",\n    answer: params.answer || \"用户回答\",\n    score: evaluation.score,\n    feedback: evaluation.feedback,\n    timestamp: new Date().toISOString()\n  };\n  \n  // 获取下一题\n  const nextIndex = questionIndex + 1;\n  const nextQuestion = outline[nextIndex] || null;\n  \n  return {\n    score: evaluation.score,\n    feedback: evaluation.feedback,\n    answerRecord: answerRecord,\n    nextQuestion: nextQuestion ? nextQuestion.question : \"\",\n    nextIndex: nextIndex,\n    isCompleted: !nextQuestion,\n    totalQuestions: outline.length,\n    progress: `${Math.min(nextIndex, outline.length)}/${outline.length}`,\n    currentQuestionTitle: currentQuestion.question || \"\"\n  };\n}",
+            "language": 5,
+            "settingOnError": { "processType": 1, "timeoutMs": 60000, "retryTimes": 0 }
+          },
+          "outputs": [
+            { "type": "integer", "name": "score" },
+            { "type": "string", "name": "feedback" },
+            { "type": "object", "name": "answerRecord", "schema": [] },
+            { "type": "string", "name": "nextQuestion" },
+            { "type": "integer", "name": "nextIndex" },
+            { "type": "boolean", "name": "isCompleted" },
+            { "type": "integer", "name": "totalQuestions" },
+            { "type": "string", "name": "progress" }
+          ],
+          "version": "v2"
+        },
+        "_temp": {
+          "bounds": { "x": -1400, "y": -200, "width": 360, "height": 150 },
+          "externalData": {
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-Code-v2.jpg",
+            "description": "执行 JavaScript/Python 代码处理数据",
+            "title": "代码_解析评估结果"
+          }
+        }
+      },
+      {
+        "id": "500002",
+        "type": "5",
+        "meta": { "position": { "x": -900, "y": -200 } },
+        "data": {
+          "nodeMeta": {
+            "title": "代码_构建更新请求",
+            "description": "执行 JavaScript/Python 代码处理数据",
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-Code-v2.jpg",
+            "mainColor": "#00B2B2",
+            "subTitle": ""
+          },
+          "inputs": {
+            "inputParameters": [
+              {
+                "name": "interview_id",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "100001", "name": "interview_id" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              },
+              {
+                "name": "answerRecord",
+                "input": {
+                  "type": "object",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "500001", "name": "answerRecord" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              },
+              {
+                "name": "nextIndex",
+                "input": {
+                  "type": "integer",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "500001", "name": "nextIndex" },
+                    "rawMeta": { "type": 2 }
+                  }
+                }
+              },
+              {
+                "name": "isCompleted",
+                "input": {
+                  "type": "boolean",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "500001", "name": "isCompleted" },
+                    "rawMeta": { "type": 4 }
+                  }
+                }
+              }
+            ],
+            "code": "async function main({ params }: Args): Promise<Output> {\n  const requestBody = {\n    currentIndex: params.nextIndex,\n    status: params.isCompleted ? 'COMPLETED' : 'IN_PROGRESS',\n    answers: [params.answerRecord]\n  };\n  \n  return {\n    requestBodyJson: JSON.stringify(requestBody)\n  };\n}",
+            "language": 5,
+            "settingOnError": { "processType": 1, "timeoutMs": 60000, "retryTimes": 0 }
+          },
+          "outputs": [
+            { "type": "string", "name": "requestBodyJson" }
+          ],
+          "version": "v2"
+        },
+        "_temp": {
+          "bounds": { "x": -900, "y": -200, "width": 360, "height": 150 },
+          "externalData": {
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-Code-v2.jpg",
+            "description": "执行 JavaScript/Python 代码处理数据",
+            "title": "代码_构建更新请求"
+          }
+        }
+      },
+      {
+        "id": "450002",
+        "type": "45",
+        "meta": { "position": { "x": -400, "y": -200 } },
+        "data": {
+          "nodeMeta": {
+            "title": "HTTP_更新面试进度",
+            "description": "发送 HTTP 请求获取数据",
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-HTTP.png",
+            "mainColor": "#3071F2",
+            "subTitle": "HTTP 请求"
+          },
+          "inputParameters": [],
+          "inputs": {
+            "apiInfo": {
+              "method": "PATCH",
+              "url": "https://wehan-proxy.819264640.workers.dev/interviews/{{block_output_100001.interview_id}}"
+            },
+            "body": {
+              "bodyType": "JSON",
+              "bodyData": {
+                "type": "ref",
+                "content": { "source": "block-output", "blockID": "500002", "name": "requestBodyJson" },
+                "rawMeta": { "type": 1 },
+                "binary": {
+                  "fileURL": {
+                    "type": "string",
+                    "value": {
+                      "type": "ref",
+                      "content": { "source": "block-output", "blockID": "", "name": "" }
+                    }
+                  }
+                },
+                "json": "{\n  \"currentIndex\": 1,\n  \"status\": \"IN_PROGRESS\",\n  \"answers\": [{\"questionIndex\": 0, \"question\": \"请介绍一下你自己\", \"answer\": \"用户回答\", \"timestamp\": \"2026-02-28T10:00:00Z\"}]\n}"
+              }
+            },
+            "headers": [
+              {
+                "name": "Content-Type",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "literal",
+                    "content": "application/json",
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              },
+              {
+                "name": "X-API-Key",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "literal",
+                    "content": "wehan_open_api_key_2026",
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              }
+            ],
+            "params": [],
+            "auth": {
+              "authType": "BEARER_AUTH",
+              "authData": { "customData": { "addTo": "header" } },
+              "authOpen": false
+            },
+            "setting": { "timeout": 60, "retryTimes": 2 },
+            "settingOnError": {}
+          },
+          "outputs": [
+            { "type": "string", "name": "body" },
+            { "type": "integer", "name": "statusCode" },
+            { "type": "string", "name": "headers" }
+          ]
+        },
+        "_temp": {
+          "bounds": { "x": -400, "y": -200, "width": 360, "height": 200 },
+          "externalData": {
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-HTTP.png",
+            "description": "发送 HTTP 请求获取数据",
+            "title": "HTTP_更新面试进度"
+          }
+        }
+      },
+      {
+        "id": "500003",
+        "type": "5",
+        "meta": { "position": { "x": 100, "y": -200 } },
+        "data": {
+          "nodeMeta": {
+            "title": "代码_生成响应",
+            "description": "执行 JavaScript/Python 代码处理数据",
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-Code-v2.jpg",
+            "mainColor": "#00B2B2",
+            "subTitle": ""
+          },
+          "inputs": {
+            "inputParameters": [
+              {
+                "name": "score",
+                "input": {
+                  "type": "integer",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "500001", "name": "score" },
+                    "rawMeta": { "type": 2 }
+                  }
+                }
+              },
+              {
+                "name": "feedback",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "500001", "name": "feedback" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              },
+              {
+                "name": "nextQuestion",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "500001", "name": "nextQuestion" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              },
+              {
+                "name": "isCompleted",
+                "input": {
+                  "type": "boolean",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "500001", "name": "isCompleted" },
+                    "rawMeta": { "type": 4 }
+                  }
+                }
+              },
+              {
+                "name": "progress",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "500001", "name": "progress" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              }
+            ],
+            "code": "async function main({ params }: Args): Promise<Output> {\n  const score = params.score;\n  const feedback = params.feedback;\n  const nextQuestion = params.nextQuestion;\n  const isCompleted = params.isCompleted;\n  const progress = params.progress;\n  \n  let responseMessage = `你的回答已收到。\\n\\n评分：${score}/10 分\\n${feedback}`;\n  \n  if (!isCompleted && nextQuestion) {\n    responseMessage += `\\n\\n下一题：${nextQuestion}`;\n  } else {\n    responseMessage += `\\n\\n恭喜你完成了所有题目！正在生成综合评估报告...`;\n  }\n  \n  return {\n    response_message: responseMessage,\n    score: score,\n    next_question: nextQuestion || \"\",\n    is_completed: isCompleted,\n    progress: progress\n  };\n}",
+            "language": 5,
+            "settingOnError": { "processType": 1, "timeoutMs": 60000, "retryTimes": 0 }
+          },
+          "outputs": [
+            { "type": "string", "name": "response_message" },
+            { "type": "integer", "name": "score" },
+            { "type": "string", "name": "next_question" },
+            { "type": "boolean", "name": "is_completed" },
+            { "type": "string", "name": "progress" }
+          ],
+          "version": "v2"
+        },
+        "_temp": {
+          "bounds": { "x": 100, "y": -200, "width": 360, "height": 200 },
+          "externalData": {
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-Code-v2.jpg",
+            "description": "执行 JavaScript/Python 代码处理数据",
+            "title": "代码_生成响应"
+          }
+        }
+      },
+      {
+        "id": "900001",
+        "type": "2",
+        "meta": { "position": { "x": 500, "y": -200 } },
+        "data": {
+          "nodeMeta": {
+            "title": "结束",
+            "description": "工作流的最终节点，用于返回工作流运行后的结果信息",
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-End-v2.jpg",
+            "mainColor": "#5C62FF"
+          },
+          "inputs": {
+            "terminatePlan": "returnVariables",
+            "inputParameters": [
+              {
+                "name": "response_message",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "500003", "name": "response_message" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              },
+              {
+                "name": "score",
+                "input": {
+                  "type": "integer",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "500003", "name": "score" },
+                    "rawMeta": { "type": 2 }
+                  }
+                }
+              },
+              {
+                "name": "next_question",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "500003", "name": "next_question" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              },
+              {
+                "name": "is_completed",
+                "input": {
+                  "type": "boolean",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "500003", "name": "is_completed" },
+                    "rawMeta": { "type": 4 }
+                  }
+                }
+              },
+              {
+                "name": "progress",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "500003", "name": "progress" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "_temp": {
+          "bounds": { "x": 500, "y": -200, "width": 360, "height": 130 },
+          "externalData": {
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-End-v2.jpg",
+            "description": "工作流的最终节点，用于返回工作流运行后的结果信息",
+            "title": "结束",
+            "mainColor": "#5C62FF"
+          }
+        }
+      }
+    ],
+    "edges": [
+      { "sourceNodeID": "100001", "targetNodeID": "450001" },
+      { "sourceNodeID": "450001", "targetNodeID": "590001" },
+      { "sourceNodeID": "590001", "targetNodeID": "300001" },
+      { "sourceNodeID": "300001", "targetNodeID": "500001" },
+      { "sourceNodeID": "500001", "targetNodeID": "500002" },
+      { "sourceNodeID": "500002", "targetNodeID": "450002" },
+      { "sourceNodeID": "450002", "targetNodeID": "500003" },
+      { "sourceNodeID": "500003", "targetNodeID": "900001" }
+    ]
+  }
+}

@@ -173,12 +173,18 @@ export type InterviewStatus = 'PREPARING' | 'IN_PROGRESS' | 'COMPLETED' | 'EXPIR
 
 export interface Interview {
   id: string
-  userId: string
+  userId?: string
+  externalUserId?: string
   jobId?: string
   applicationId?: string
+  // 面试内容（用于断点恢复）
   outline?: InterviewQuestion[]
+  currentIndex?: number
+  answers?: InterviewAnswer[]
+  // 面试过程
   conversation?: ConversationMessage[]
   duration?: number
+  // 评估报告
   status: InterviewStatus
   totalScore?: number
   dimensions?: ScoreDimension[]
@@ -196,6 +202,14 @@ export interface InterviewQuestion {
   category: string
   question: string
   difficulty: 'easy' | 'medium' | 'hard'
+}
+
+export interface InterviewAnswer {
+  questionIndex: number
+  question: string
+  answer: string
+  audioUrl?: string
+  timestamp: string
 }
 
 export interface ConversationMessage {

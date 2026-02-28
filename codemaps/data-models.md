@@ -2,7 +2,7 @@
 
 > PostgreSQL + Prisma ORM 数据模型设计
 
-**更新时间**: 2026-02-27
+**更新时间**: 2026-02-28
 
 ---
 
@@ -326,18 +326,21 @@ PENDING ──查看──► VIEWED ──安排面试──► INTERVIEWING �
 ```prisma
 model Interview {
   id              String          @id @default(cuid())
-  userId          String
+  userId          String?
+  externalUserId  String?         // C端用户ID（豆包user_id）
   jobId           String?
   applicationId   String?         @unique
 
-  // 面试大纲
-  outline         Json?           // InterviewQuestion[]
+  // ===== 面试内容 =====
+  outline         Json?           // 题目列表 InterviewQuestion[]
+  currentIndex    Int?            @default(0)   // 当前面试进度（第几题，用于断点恢复）
+  answers         Json?                       // 回答记录数组 InterviewAnswer[]
 
-  // 面试过程
+  // ===== 面试过程 =====
   conversation    Json?           // ConversationMessage[]
   duration        Int?            // 面试时长(秒)
 
-  // 评估报告
+  // ===== 评估报告 =====
   status          InterviewStatus @default(PREPARING)
   totalScore      Float?          // 综合评分 0-100
   dimensions      Json?           // ScoreDimension[]
@@ -345,18 +348,21 @@ model Interview {
   improvements    Json?           // Improvement[]
   suggestions     String?         @db.Text
 
-  // 语音文件
+  // ===== 语音文件 =====
   audioUrl        String?
 
+  // ===== 时间戳 =====
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
   completedAt     DateTime?
 
-  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // ===== 关联 =====
+  user            User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
   application     Application?    @relation(fields: [applicationId], references: [id])
 
-  @@index([userId])
   @@index([status])
+  @@index([userId])
+  @@index([externalUserId])
 }
 ```
 
@@ -370,6 +376,17 @@ interface InterviewQuestion {
 }
 ```
 
+**InterviewAnswer 结构**:
+```typescript
+interface InterviewAnswer {
+  questionIndex: number   // 题目索引
+  question: string        // 题目内容
+  answer: string          // 回答内容
+  audioUrl?: string       // 回答音频URL（可选）
+  timestamp: string       // 回答时间
+}
+```
+
 **ScoreDimension 结构**:
 ```typescript
 interface ScoreDimension {
@@ -379,6 +396,13 @@ interface ScoreDimension {
   comment?: string
 }
 ```
+
+**断点恢复流程**:
+
+1. **创建面试**: `POST /api/open/interviews` 设置 `status: IN_PROGRESS`，初始化 `outline`、`currentIndex: 0`、`answers: []`
+2. **保存进度**: 每回答一题，调用 `PATCH /api/open/interviews/{id}` 更新 `currentIndex` 和 `answers`
+3. **恢复面试**: 调用 `GET /api/open/interviews?userId=xxx&status=IN_PROGRESS` 查询未完成的面试
+4. **完成面试**: 调用 `PATCH /api/open/interviews/{id}` 更新 `status: COMPLETED` 并保存评估结果
 
 ---
 
@@ -569,4 +593,4 @@ npx prisma validate
 
 ---
 
-*文档版本: 1.0 | 生成时间: 2026-02-27*
+*文档版本: 1.1 | 生成时间: 2026-02-28*

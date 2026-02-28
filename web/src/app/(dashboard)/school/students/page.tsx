@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
 import {
-  Card, Table, Button, Space, Tag, Typography, message, Tooltip, Spin, Input, Select
+  Card, Table, Button, Space, Tag, Typography, App, Tooltip, Spin, Input, Select
 } from 'antd'
 import { ReloadOutlined, EyeOutlined, DownloadOutlined } from '@ant-design/icons'
 import DashboardLayout from '@/components/layout/DashboardLayout'
@@ -37,6 +37,7 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
 export default function SchoolStudentsPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const { message } = App.useApp()
   const [students, setStudents] = useState<Student[]>([])
   const [loading, setLoading] = useState(false)
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 })

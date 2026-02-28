@@ -1,0 +1,663 @@
+{
+  "type": "coze-workflow-clipboard-data",
+  "source": {
+    "workflowId": "",
+    "flowMode": 0,
+    "spaceId": "7491691397280874533",
+    "isDouyin": false,
+    "host": "www.coze.cn"
+  },
+  "bounds": {
+    "x": -4100,
+    "y": -400,
+    "width": 5000,
+    "height": 600
+  },
+  "json": {
+    "nodes": [
+      {
+        "id": "100001",
+        "type": "1",
+        "meta": { "position": { "x": -3900, "y": -200 } },
+        "data": {
+          "nodeMeta": {
+            "description": "工作流的起始节点，用于设定启动工作流需要的信息",
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-Start-v2.jpg",
+            "subTitle": "",
+            "title": "开始"
+          },
+          "outputs": [
+            { "type": "string", "name": "job_id", "required": true },
+            { "type": "string", "name": "user_id", "required": true },
+            { "type": "string", "name": "resume_id", "required": false }
+          ],
+          "trigger_parameters": []
+        },
+        "_temp": {
+          "bounds": { "x": -4100, "y": -200, "width": 360, "height": 130 },
+          "externalData": {
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-Start-v2.jpg",
+            "description": "工作流的起始节点，用于设定启动工作流需要的信息",
+            "title": "开始",
+            "mainColor": "#5C62FF"
+          }
+        }
+      },
+      {
+        "id": "450001",
+        "type": "45",
+        "meta": { "position": { "x": -3400, "y": -200 } },
+        "data": {
+          "nodeMeta": {
+            "description": "发送 HTTP 请求获取数据",
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-HTTP.png",
+            "mainColor": "#3071F2",
+            "subTitle": "HTTP 请求",
+            "title": "HTTP_获取岗位详情"
+          },
+          "inputParameters": [],
+          "inputs": {
+            "apiInfo": {
+              "method": "GET",
+              "url": "https://wehan-proxy.819264640.workers.dev/jobs/{{block_output_100001.job_id}}"
+            },
+            "body": {
+              "bodyType": "EMPTY",
+              "bodyData": {
+                "binary": {
+                  "fileURL": {
+                    "type": "string",
+                    "value": {
+                      "type": "ref",
+                      "content": { "source": "block-output", "blockID": "", "name": "" },
+                      "rawMeta": { "type": 1 }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": [
+              {
+                "name": "X-API-Key",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "literal",
+                    "content": "wehan_open_api_key_2026",
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              }
+            ],
+            "params": [],
+            "auth": {
+              "authType": "BEARER_AUTH",
+              "authData": { "customData": { "addTo": "header" } },
+              "authOpen": false
+            },
+            "setting": { "timeout": 60, "retryTimes": 2 },
+            "settingOnError": {}
+          },
+          "outputs": [
+            { "type": "string", "name": "body" },
+            { "type": "integer", "name": "statusCode" },
+            { "type": "string", "name": "headers" }
+          ]
+        },
+        "_temp": {
+          "bounds": { "x": -3600, "y": -200, "width": 360, "height": 200 },
+          "externalData": {
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-HTTP.png",
+            "description": "发送 HTTP 请求获取数据",
+            "title": "HTTP_获取岗位详情",
+            "mainColor": "#3071F2"
+          }
+        }
+      },
+      {
+        "id": "590001",
+        "type": "59",
+        "meta": { "position": { "x": -2900, "y": -200 } },
+        "data": {
+          "nodeMeta": {
+            "description": "将 JSON 字符串转换为对象",
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-JSONParse-v2.jpg",
+            "subTitle": "",
+            "title": "JSON反序列化"
+          },
+          "inputs": {
+            "inputParameters": [
+              {
+                "name": "jsonString",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "450001", "name": "body" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              }
+            ]
+          },
+          "outputs": [
+            { "type": "object", "name": "output", "schema": [] }
+          ]
+        },
+        "_temp": {
+          "bounds": { "x": -3100, "y": -200, "width": 360, "height": 120 },
+          "externalData": {
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-JSONParse-v2.jpg",
+            "description": "将 JSON 字符串转换为对象",
+            "title": "JSON反序列化",
+            "mainColor": "#F2B600"
+          }
+        }
+      },
+      {
+        "id": "500001",
+        "type": "5",
+        "meta": { "position": { "x": -2400, "y": -200 } },
+        "data": {
+          "nodeMeta": {
+            "description": "执行 JavaScript/Python 代码处理数据",
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-Code-v2.jpg",
+            "subTitle": "",
+            "title": "代码_提取岗位信息"
+          },
+          "inputs": {
+            "inputParameters": [
+              {
+                "name": "jobData",
+                "input": {
+                  "type": "object",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "590001", "name": "output" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              }
+            ],
+            "code": "async function main({ params }: Args): Promise<Output> {\n  const jobData = params.jobData;\n  const data = jobData.data || jobData;\n  \n  const jobInfo = {\n    title: data.title || '未知岗位',\n    company: data.enterprise?.name || '未知公司',\n    industry: data.industry || '',\n    description: data.description || data.responsibilities || '',\n    requirements: data.requirements || '',\n    skills: data.skills || [],\n    salaryMin: data.salaryMin || 0,\n    salaryMax: data.salaryMax || 0,\n    location: data.location || '武汉'\n  };\n  \n  const jdText = `岗位名称：${jobInfo.title}\\n公司：${jobInfo.company}\\n行业：${jobInfo.industry}\\n工作地点：${jobInfo.location}\\n薪资范围：${jobInfo.salaryMin}-${jobInfo.salaryMax}元\\n\\n岗位职责：\\n${jobInfo.description}\\n\\n任职要求：\\n${jobInfo.requirements}\\n\\n技能要求：${jobInfo.skills.join('、')}`;\n  \n  return {\n    jobInfo: jobInfo,\n    jdText: jdText\n  };\n}",
+            "language": 5,
+            "settingOnError": { "processType": 1, "timeoutMs": 60000, "retryTimes": 0 }
+          },
+          "outputs": [
+            { "type": "object", "name": "jobInfo", "schema": [] },
+            { "type": "string", "name": "jdText" }
+          ],
+          "version": "v2"
+        },
+        "_temp": {
+          "bounds": { "x": -2600, "y": -200, "width": 360, "height": 150 },
+          "externalData": {
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-Code-v2.jpg",
+            "description": "执行 JavaScript/Python 代码处理数据",
+            "title": "代码_提取岗位信息",
+            "mainColor": "#00B2B2"
+          }
+        }
+      },
+      {
+        "id": "300001",
+        "type": "3",
+        "meta": { "position": { "x": -1900, "y": -200 } },
+        "data": {
+          "nodeMeta": {
+            "description": "调用大语言模型处理文本",
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-LLM-v2.jpg",
+            "subTitle": "大模型",
+            "title": "大模型_生成面试题"
+          },
+          "inputs": {
+            "inputParameters": [
+              {
+                "name": "jdText",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "500001", "name": "jdText" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              }
+            ],
+            "llmParam": [
+              {
+                "name": "prompt",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "literal",
+                    "content": "你是一位资深的面试官，请根据以下岗位信息生成5道面试题目。\n\n岗位信息：\n{{jdText}}\n\n要求：\n1. 题目应涵盖专业知识和软技能两个方面\n2. 题目难度适中，适合应届毕业生\n3. 每道题目应该有明确的考察点\n4. 返回JSON格式，包含题目列表\n\n请直接返回以下JSON格式（不要包含```json标记）：\n{\n  \"questions\": [\n    {\n      \"id\": \"q1\",\n      \"category\": \"专业/软技能\",\n      \"question\": \"题目内容\",\n      \"difficulty\": \"easy/medium/hard\",\n      \"evaluationPoints\": [\"考察点1\", \"考察点2\"]\n    }\n  ]\n}",
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              },
+              {
+                "name": "modleName",
+                "input": {
+                  "type": "string",
+                  "value": { "type": "literal", "content": "doubao-pro-32k", "rawMeta": { "type": 1 } }
+                }
+              },
+              {
+                "name": "modelType",
+                "input": {
+                  "type": "integer",
+                  "value": { "type": "literal", "content": "0", "rawMeta": { "type": 2 } }
+                }
+              },
+              {
+                "name": "temperature",
+                "input": { "type": "float", "value": { "type": "literal", "content": "0.7", "rawMeta": { "type": 4 } } }
+              },
+              {
+                "name": "maxTokens",
+                "input": { "type": "integer", "value": { "type": "literal", "content": "2048", "rawMeta": { "type": 2 } } }
+              },
+              {
+                "name": "responseFormat",
+                "input": { "type": "integer", "value": { "type": "literal", "content": "2", "rawMeta": { "type": 2 } } }
+              },
+              {
+                "name": "generationDiversity",
+                "input": { "type": "string", "value": { "type": "literal", "content": "balance", "rawMeta": { "type": 1 } } }
+              }
+            ],
+            "fcParamVar": { "knowledgeFCParam": {} },
+            "settingOnError": { "switch": false, "processType": 1, "timeoutMs": 180000, "retryTimes": 1 }
+          },
+          "outputs": [
+            { "type": "string", "name": "text" },
+            { "type": "string", "name": "text_str" }
+          ]
+        },
+        "_temp": {
+          "bounds": { "x": -2100, "y": -200, "width": 360, "height": 200 },
+          "externalData": {
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-LLM-v2.jpg",
+            "description": "调用大语言模型处理文本",
+            "title": "大模型_生成面试题",
+            "mainColor": "#00D4AA"
+          }
+        }
+      },
+      {
+        "id": "500002",
+        "type": "5",
+        "meta": { "position": { "x": -1400, "y": -200 } },
+        "data": {
+          "nodeMeta": {
+            "description": "执行 JavaScript/Python 代码处理数据",
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-Code-v2.jpg",
+            "subTitle": "",
+            "title": "代码_解析题目"
+          },
+          "inputs": {
+            "inputParameters": [
+              {
+                "name": "llmOutput",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "300001", "name": "text" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              }
+            ],
+            "code": "async function main({ params }: Args): Promise<Output> {\n  const llmOutput = params.llmOutput;\n  \n  let questions = [];\n  try {\n    let jsonStr = llmOutput;\n    const jsonMatch = llmOutput.match(/\\{[\\s\\S]*\\}/);\n    if (jsonMatch) {\n      jsonStr = jsonMatch[0];\n    }\n    const parsed = JSON.parse(jsonStr);\n    questions = parsed.questions || [];\n  } catch (e) {\n    questions = [\n      { id: 'q1', category: '专业', question: '请介绍一下你自己', difficulty: 'easy', evaluationPoints: ['表达能力', '逻辑思维'] },\n      { id: 'q2', category: '专业', question: '你对我们公司有什么了解？', difficulty: 'easy', evaluationPoints: ['准备工作', '行业认知'] },\n      { id: 'q3', category: '专业', question: '请描述一个你解决过的技术难题', difficulty: 'medium', evaluationPoints: ['问题解决', '技术能力'] },\n      { id: 'q4', category: '软技能', question: '你如何处理工作中的压力？', difficulty: 'medium', evaluationPoints: ['抗压能力', '情绪管理'] },\n      { id: 'q5', category: '软技能', question: '你对未来的职业规划是什么？', difficulty: 'easy', evaluationPoints: ['职业规划', '自我认知'] }\n    ];\n  }\n  \n  return {\n    questions: questions,\n    questionCount: questions.length,\n    outlineJson: JSON.stringify(questions)\n  };\n}",
+            "language": 5,
+            "settingOnError": { "processType": 1, "timeoutMs": 60000, "retryTimes": 0 }
+          },
+          "outputs": [
+            { "type": "list", "name": "questions", "schema": { "type": "object", "schema": [] } },
+            { "type": "integer", "name": "questionCount" },
+            { "type": "string", "name": "outlineJson" }
+          ],
+          "version": "v2"
+        },
+        "_temp": {
+          "bounds": { "x": -1600, "y": -200, "width": 360, "height": 150 },
+          "externalData": {
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-Code-v2.jpg",
+            "description": "执行 JavaScript/Python 代码处理数据",
+            "title": "代码_解析题目",
+            "mainColor": "#00B2B2"
+          }
+        }
+      },
+      {
+        "id": "500004",
+        "type": "5",
+        "meta": { "position": { "x": -900, "y": -200 } },
+        "data": {
+          "nodeMeta": {
+            "description": "执行 JavaScript/Python 代码处理数据",
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-Code-v2.jpg",
+            "subTitle": "",
+            "title": "代码_构建请求体"
+          },
+          "inputs": {
+            "inputParameters": [
+              {
+                "name": "user_id",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "100001", "name": "user_id" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              },
+              {
+                "name": "job_id",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "100001", "name": "job_id" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              },
+              {
+                "name": "outlineJson",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "500002", "name": "outlineJson" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              }
+            ],
+            "code": "async function main({ params }: Args): Promise<Output> {\n  const requestBody = {\n    userId: params.user_id,\n    jobId: params.job_id,\n    status: 'IN_PROGRESS',\n    outline: JSON.parse(params.outlineJson),\n    currentIndex: 0,\n    answers: []\n  };\n  \n  return {\n    requestBodyJson: JSON.stringify(requestBody)\n  };\n}",
+            "language": 5,
+            "settingOnError": { "processType": 1, "timeoutMs": 60000, "retryTimes": 0 }
+          },
+          "outputs": [
+            { "type": "string", "name": "requestBodyJson" }
+          ],
+          "version": "v2"
+        },
+        "_temp": {
+          "bounds": { "x": -1100, "y": -200, "width": 360, "height": 150 },
+          "externalData": {
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-Code-v2.jpg",
+            "description": "执行 JavaScript/Python 代码处理数据",
+            "title": "代码_构建请求体",
+            "mainColor": "#00B2B2"
+          }
+        }
+      },
+      {
+        "id": "450002",
+        "type": "45",
+        "meta": { "position": { "x": -400, "y": -200 } },
+        "data": {
+          "nodeMeta": {
+            "description": "发送 HTTP 请求获取数据",
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-HTTP.png",
+            "mainColor": "#3071F2",
+            "subTitle": "HTTP 请求",
+            "title": "HTTP_创建面试记录"
+          },
+          "inputParameters": [],
+          "inputs": {
+            "apiInfo": {
+              "method": "POST",
+              "url": "https://wehan-proxy.819264640.workers.dev/interviews"
+            },
+            "body": {
+              "bodyType": "JSON",
+              "bodyData": {
+                "type": "ref",
+                "content": { "source": "block-output", "blockID": "500004", "name": "requestBodyJson" },
+                "rawMeta": { "type": 1 },
+                "binary": {
+                  "fileURL": {
+                    "type": "string",
+                    "value": {
+                      "type": "ref",
+                      "content": { "source": "block-output", "blockID": "", "name": "" }
+                    }
+                  }
+                },
+                "json": "{\n  \"userId\": \"test_user_c_001\",\n  \"jobId\": \"cmm5o5b8q000ezguj2h8ofvyj\",\n  \"status\": \"IN_PROGRESS\",\n  \"outline\": [\n    {\n      \"id\": \"q1\",\n      \"category\": \"专业\",\n      \"question\": \"请介绍一下你自己\",\n      \"difficulty\": \"easy\",\n      \"evaluationPoints\": [\"表达能力\", \"逻辑思维\"]\n    }\n  ],\n  \"currentIndex\": 0,\n  \"answers\": []\n}"
+              }
+            },
+            "headers": [
+              {
+                "name": "Content-Type",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "literal",
+                    "content": "application/json",
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              },
+              {
+                "name": "X-API-Key",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "literal",
+                    "content": "wehan_open_api_key_2026",
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              }
+            ],
+            "params": [],
+            "auth": {
+              "authType": "BEARER_AUTH",
+              "authData": { "customData": { "addTo": "header" } },
+              "authOpen": false
+            },
+            "setting": { "timeout": 60, "retryTimes": 2 },
+            "settingOnError": {}
+          },
+          "outputs": [
+            { "type": "string", "name": "body" },
+            { "type": "integer", "name": "statusCode" },
+            { "type": "string", "name": "headers" }
+          ]
+        },
+        "_temp": {
+          "bounds": { "x": -600, "y": -200, "width": 360, "height": 200 },
+          "externalData": {
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-HTTP.png",
+            "description": "发送 HTTP 请求获取数据",
+            "title": "HTTP_创建面试记录",
+            "mainColor": "#3071F2"
+          }
+        }
+      },
+      {
+        "id": "500003",
+        "type": "5",
+        "meta": { "position": { "x": 100, "y": -200 } },
+        "data": {
+          "nodeMeta": {
+            "description": "执行 JavaScript/Python 代码处理数据",
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-Code-v2.jpg",
+            "subTitle": "",
+            "title": "代码_提取面试ID"
+          },
+          "inputs": {
+            "inputParameters": [
+              {
+                "name": "responseBody",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "450002", "name": "body" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              },
+              {
+                "name": "jobInfo",
+                "input": {
+                  "type": "object",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "500001", "name": "jobInfo" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              },
+              {
+                "name": "questions",
+                "input": {
+                  "type": "list",
+                  "schema": { "type": "object", "schema": [] },
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "500002", "name": "questions" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              }
+            ],
+            "code": "async function main({ params }: Args): Promise<Output> {\n  const responseBody = params.responseBody;\n  const jobInfo = params.jobInfo;\n  const questions = params.questions;\n  \n  let interviewId = '';\n  try {\n    const parsed = JSON.parse(responseBody);\n    interviewId = parsed.data?.id || '';\n  } catch (e) {\n    interviewId = 'temp_' + Date.now();\n  }\n  \n  const openingMessage = `你好！我是你的面试官。今天我们将进行${jobInfo.title}岗位的模拟面试。\\n\\n我已经准备了${questions.length}道题目，涵盖专业知识和软技能两个方面。\\n\\n准备好了吗？让我们开始吧！`;\n  \n  const firstQuestion = questions[0]?.question || '请先简单介绍一下你自己。';\n  \n  return {\n    interviewId: interviewId,\n    openingMessage: openingMessage,\n    firstQuestion: firstQuestion,\n    totalQuestions: questions.length,\n    jobTitle: jobInfo.title,\n    companyName: jobInfo.company\n  };\n}",
+            "language": 5,
+            "settingOnError": { "processType": 1, "timeoutMs": 60000, "retryTimes": 0 }
+          },
+          "outputs": [
+            { "type": "string", "name": "interviewId" },
+            { "type": "string", "name": "openingMessage" },
+            { "type": "string", "name": "firstQuestion" },
+            { "type": "integer", "name": "totalQuestions" },
+            { "type": "string", "name": "jobTitle" },
+            { "type": "string", "name": "companyName" }
+          ],
+          "version": "v2"
+        },
+        "_temp": {
+          "bounds": { "x": -100, "y": -200, "width": 360, "height": 200 },
+          "externalData": {
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-Code-v2.jpg",
+            "description": "执行 JavaScript/Python 代码处理数据",
+            "title": "代码_提取面试ID",
+            "mainColor": "#00B2B2"
+          }
+        }
+      },
+      {
+        "id": "900001",
+        "type": "2",
+        "meta": { "position": { "x": 600, "y": -200 } },
+        "data": {
+          "nodeMeta": {
+            "description": "工作流的最终节点，用于返回工作流运行后的结果信息",
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-End-v2.jpg",
+            "subTitle": "",
+            "title": "结束"
+          },
+          "inputs": {
+            "terminatePlan": "returnVariables",
+            "inputParameters": [
+              {
+                "name": "interview_id",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "500003", "name": "interviewId" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              },
+              {
+                "name": "opening_message",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "500003", "name": "openingMessage" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              },
+              {
+                "name": "first_question",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "500003", "name": "firstQuestion" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              },
+              {
+                "name": "total_questions",
+                "input": {
+                  "type": "integer",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "500003", "name": "totalQuestions" },
+                    "rawMeta": { "type": 2 }
+                  }
+                }
+              },
+              {
+                "name": "job_title",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "500003", "name": "jobTitle" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              },
+              {
+                "name": "company_name",
+                "input": {
+                  "type": "string",
+                  "value": {
+                    "type": "ref",
+                    "content": { "source": "block-output", "blockID": "500003", "name": "companyName" },
+                    "rawMeta": { "type": 1 }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "_temp": {
+          "bounds": { "x": 400, "y": -200, "width": 360, "height": 200 },
+          "externalData": {
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-End-v2.jpg",
+            "description": "工作流的最终节点，用于返回工作流运行后的结果信息",
+            "title": "结束",
+            "mainColor": "#5C62FF"
+          }
+        }
+      }
+    ],
+    "edges": [
+      { "sourceNodeID": "100001", "targetNodeID": "450001" },
+      { "sourceNodeID": "450001", "targetNodeID": "590001" },
+      { "sourceNodeID": "590001", "targetNodeID": "500001" },
+      { "sourceNodeID": "500001", "targetNodeID": "300001" },
+      { "sourceNodeID": "300001", "targetNodeID": "500002" },
+      { "sourceNodeID": "500002", "targetNodeID": "500004" },
+      { "sourceNodeID": "500004", "targetNodeID": "450002" },
+      { "sourceNodeID": "450002", "targetNodeID": "500003" },
+      { "sourceNodeID": "500003", "targetNodeID": "900001" }
+    ]
+  }
+}

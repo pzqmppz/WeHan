@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
 import {
-  Card, Table, Button, Space, Tag, Typography, message, Tooltip, Spin, Modal, Form, Select
+  Card, Table, Button, Space, Tag, Typography, App, Tooltip, Spin, Modal, Form, Select
 } from 'antd'
 import { ReloadOutlined, PlusOutlined, CheckCircleOutlined } from '@ant-design/icons'
 import DashboardLayout from '@/components/layout/DashboardLayout'
@@ -47,6 +47,7 @@ interface PushRecord {
 export default function SchoolPushPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const { message } = App.useApp()
   const [records, setRecords] = useState<PushRecord[]>([])
   const [jobs, setJobs] = useState<Job[]>([])
   const [loading, setLoading] = useState(false)

@@ -33,6 +33,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null
         }
 
+        // 检查用户状态 - 返回带有错误代码的用户对象
+        if (user.status === 'INACTIVE') {
+          return { id: '', error: 'ACCOUNT_DISABLED' } as any
+        }
+
+        if (user.status === 'PENDING') {
+          return { id: '', error: 'ACCOUNT_PENDING' } as any
+        }
+
+        if (user.status === 'REJECTED') {
+          return { id: '', error: 'ACCOUNT_REJECTED' } as any
+        }
+
         return {
           id: user.id,
           email: user.email,
@@ -49,10 +62,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   pages: {
     signIn: '/login',
+    error: '/login',
   },
   callbacks: {
     async jwt({ token, user }) {
-      if (user) {
+      if (user && !(user as any).error) {
         return {
           ...token,
           userId: user.id,

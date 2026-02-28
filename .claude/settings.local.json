@@ -2,7 +2,39 @@
   "permissions": {
     "allow": [
       "Bash(node -e \":*)",
-      "mcp__web-search-prime__webSearchPrime"
+      "mcp__web-search-prime__webSearchPrime",
+      "Bash(python:*)",
+      "Bash(curl:*)",
+      "Bash(查看边的结构)",
+      "Bash(python3:*)",
+      "Bash(},)",
+      "Bash(\"json\": {)",
+      "Bash(\"nodes\": [)",
+      "Bash({)",
+      "Bash(\"id\": \"172113\",)",
+      "Bash(\"type\": \"332\",)",
+      "Bash(\"meta\": {)",
+      "Bash(\"position\": {)",
+      "Bash(\"x\": 334,)",
+      "Bash(\"y\": 202.86045740422372)",
+      "Bash(\"canvasPosition\": {)",
+      "Bash(\"x\": 293.9851231088api: \"https://api.example.com/jobs\",,)",
+      "Bash(\"method\": \"GET\",)",
+      "Bash(\"headers\": {\"X-API-Key\": \"xxx\"},)",
+      "Bash(\"body\": null)",
+      "Bash(})",
+      "Bash(],)",
+      "Bash(\"edges\": [])",
+      "Bash('''\n\nd = json.loads\\(json_str\\)\nprint\\(\"\"=== HTTP 请求节点结构 ===\"\"\\)\nprint\\(f\"\"节点类型: {d['json']['nodes'][0]['type']\"\"\\)\nprint\\(f\"\"节点ID: {d['json']['nodes'][0]['id']\"\"\\)\nprint\\(f\"\"内部节点类型: {d['json']['nodes'][0]['blocks'][0]['type']}\"\"\\)\nprint\\(f\"\"内部节点ID: {d['json']['nodes'][0]['blocks'][0]['id ']}\"\n\n# 打印完整的节点结构\nprint\\(\"n=== 完整结构 ===\"\\)\nprint\\(json.dumps\\(d, indent=2, ensure_ascii=False\\)\\)\n\")",
+      "Bash(powershell:*)",
+      "Bash(del:*)",
+      "Bash(dir:*)",
+      "Bash(ls:*)",
+      "Bash(npx prisma db execute:*)",
+      "Bash(node --eval \":*)",
+      "Bash(for:*)",
+      "Bash(do echo:*)",
+      "Bash(done:*)"
     ]
   }
 }

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
 import {
-  Card, Form, Input, Select, Button, Space, message, Spin,
+  Card, Form, Input, Select, Button, Space, App, Spin,
   Typography, Row, Col, Upload, Avatar, Tag, Divider
 } from 'antd'
 import {
@@ -62,6 +62,7 @@ const SCALE_OPTIONS = [
 export default function EnterpriseProfilePage() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const { message } = App.useApp()
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
