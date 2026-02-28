@@ -22,10 +22,10 @@ export async function GET(request: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { id: (session.user as any).id },
-      include: { Enterprise: true },
+      include: { enterprise: true },
     })
 
-    if (!user || !user.Enterprise) {
+    if (!user || !user.enterprise) {
       return NextResponse.json(
         { success: false, error: '企业信息不存在' },
         { status: 404 }
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: user.Enterprise,
+      data: user.enterprise,
     })
   } catch (error) {
     console.error('Get enterprise error:', error)
@@ -59,10 +59,10 @@ export async function PUT(request: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { id: (session.user as any).id },
-      include: { Enterprise: true },
+      include: { enterprise: true },
     })
 
-    if (!user || !user.Enterprise) {
+    if (!user || !user.enterprise) {
       return NextResponse.json(
         { success: false, error: '企业信息不存在' },
         { status: 404 }
@@ -92,7 +92,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const updatedEnterprise = await prisma.enterprise.update({
-      where: { id: user.Enterprise.id },
+      where: { id: user.enterprise.id },
       data: {
         name,
         logo,
