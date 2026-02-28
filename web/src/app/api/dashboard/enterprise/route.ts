@@ -106,11 +106,11 @@ export async function GET(request: NextRequest) {
           id: true,
           title: true,
           _count: {
-            select: { application: true },
+            select: { applications: true },
           },
         },
         orderBy: {
-          application: { _count: 'desc' },
+          applications: { _count: 'desc' },
         },
         take: 5,
       }),
@@ -138,7 +138,7 @@ export async function GET(request: NextRequest) {
     const hotJobs = hotJobsData.map(job => ({
       id: job.id,
       title: job.title,
-      applications: job._count.application,
+      applications: job._count.applications,
       views: 0, // 暂无浏览数据
     }))
 
