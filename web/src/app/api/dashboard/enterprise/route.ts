@@ -119,7 +119,9 @@ export async function GET(request: NextRequest) {
     // 格式化最新投递数据
     const recentApplications = recentApplicationsData.map(app => {
       const timeAgo = getTimeAgo(app.createdAt)
-      const resume = app.user?.resume?.[0] // 取第一个简历
+      // resume 是数组，取第一个
+      const resumes = app.user?.resume as any[] || []
+      const resume = resumes[0]
       return {
         id: app.id,
         name: app.user?.name || '未知用户',
