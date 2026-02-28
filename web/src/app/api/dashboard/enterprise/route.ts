@@ -20,17 +20,17 @@ export async function GET(request: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { id: (session.user as any).id },
-      include: { enterprise: true },
+      include: { Enterprise: true },
     })
 
-    if (!user || !user.enterprise) {
+    if (!user || !user.Enterprise) {
       return NextResponse.json(
         { success: false, error: '企业信息不存在' },
         { status: 404 }
       )
     }
 
-    const enterpriseId = user.enterprise.id
+    const enterpriseId = user.Enterprise.id
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
       // 今日新增投递
       prisma.application.count({
         where: {
-          job: { enterpriseId },
+          Job: { enterpriseId },
           createdAt: { gte: today },
         },
       }),
@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
       // 待处理简历
       prisma.application.count({
         where: {
-          job: { enterpriseId },
+          Job: { enterpriseId },
           status: 'PENDING',
         },
       }),
@@ -62,8 +62,8 @@ export async function GET(request: NextRequest) {
       // 今日面试（基于 Interview 表）
       prisma.interview.count({
         where: {
-          application: {
-            job: { enterpriseId },
+          Application: {
+            Job: { enterpriseId },
           },
           createdAt: { gte: today },
         },
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
       // 已录用
       prisma.application.count({
         where: {
-          job: { enterpriseId },
+          Job: { enterpriseId },
           status: 'OFFERED',
         },
       }),
@@ -80,18 +80,18 @@ export async function GET(request: NextRequest) {
       // 最新投递（最近5条）
       prisma.application.findMany({
         where: {
-          job: { enterpriseId },
+          Job: { enterpriseId },
         },
         include: {
-          user: {
+          User: {
             include: {
-              resume: true,
+              Resume: true,
             },
           },
-          job: {
+          Job: {
             select: { title: true },
           },
-          interview: {
+          Interview: {
             select: { totalScore: true },
           },
         },
@@ -106,11 +106,11 @@ export async function GET(request: NextRequest) {
           id: true,
           title: true,
           _count: {
-            select: { applications: true },
+            select: { Application: true },
           },
         },
         orderBy: {
-          applications: { _count: 'desc' },
+          Application: { _count: 'desc' },
         },
         take: 5,
       }),
@@ -119,18 +119,16 @@ export async function GET(request: NextRequest) {
     // 格式化最新投递数据
     const recentApplications = recentApplicationsData.map(app => {
       const timeAgo = getTimeAgo(app.createdAt)
-      // resume 是数组，取第一个
-      const resumes = app.user?.resume as any[] || []
-      const resume = resumes[0]
+      const resume = app.User?.Resume?.[0]
       return {
         id: app.id,
-        name: app.user?.name || '未知用户',
-        position: app.job.title,
+        name: app.User?.name || '未知用户',
+        position: app.Job?.title || '未知岗位',
         school: resume?.education
           ? getSchoolFromEducation(resume.education)
           : '未知学校',
-        score: app.interview?.totalScore
-          ? Math.round(app.interview.totalScore)
+        score: app.Interview?.totalScore
+          ? Math.round(app.Interview.totalScore)
           : null,
         time: timeAgo,
       }
@@ -140,7 +138,7 @@ export async function GET(request: NextRequest) {
     const hotJobs = hotJobsData.map(job => ({
       id: job.id,
       title: job.title,
-      applications: job._count.applications,
+      applications: job._count.Application,
       views: 0, // 暂无浏览数据
     }))
 

@@ -64,7 +64,7 @@ export async function GET(
         status: 'PUBLISHED',
       },
       include: {
-        enterprise: {
+        Enterprise: {
           select: {
             id: true,
             name: true,
@@ -102,11 +102,11 @@ export async function GET(
       freshGraduate: job.freshGraduate,
       headcount: job.headcount,
       publishedAt: job.publishedAt,
-      enterprise: job.enterprise ? {
-        id: job.enterprise.id,
-        name: job.enterprise.name,
-        industry: job.enterprise.industry,
-        logo: job.enterprise.logo,
+      enterprise: job.Enterprise ? {
+        id: job.Enterprise.id,
+        name: job.Enterprise.name,
+        industry: job.Enterprise.industry,
+        logo: job.Enterprise.logo,
       } : null,
     }
 

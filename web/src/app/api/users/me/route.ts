@@ -24,8 +24,8 @@ export async function GET(request: NextRequest) {
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: {
-        school: true,
-        enterprise: true,
+        School: true,
+        Enterprise: true,
       },
     })
 
@@ -40,8 +40,8 @@ export async function GET(request: NextRequest) {
       success: true,
       data: {
         ...userInfo,
-        school: user.school,
-        enterprise: user.enterprise,
+        School: user.School,
+        Enterprise: user.Enterprise,
       },
     })
   } catch (error: any) {
@@ -85,8 +85,8 @@ export async function PUT(request: NextRequest) {
         updatedAt: new Date(),
       },
       include: {
-        school: true,
-        enterprise: true,
+        School: true,
+        Enterprise: true,
       },
     })
 
@@ -97,8 +97,8 @@ export async function PUT(request: NextRequest) {
       success: true,
       data: {
         ...userInfo,
-        school: user.school,
-        enterprise: user.enterprise,
+        School: user.School,
+        Enterprise: user.Enterprise,
       },
     })
   } catch (error: any) {
