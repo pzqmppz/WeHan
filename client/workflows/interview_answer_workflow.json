@@ -59,7 +59,7 @@
           "inputs": {
             "apiInfo": {
               "method": "GET",
-              "url": "https://wehan-proxy.819264640.workers.dev/interviews/{{block_output_100001.interview_id}}"
+              "url": "http://111.231.51.9/api/open/interviews/{{block_output_100001.interview_id}}"
             },
             "body": {
               "bodyType": "EMPTY",
@@ -440,7 +440,7 @@
           "inputs": {
             "apiInfo": {
               "method": "PATCH",
-              "url": "https://wehan-proxy.819264640.workers.dev/interviews/{{block_output_100001.interview_id}}"
+              "url": "http://111.231.51.9/api/open/interviews/{{block_output_100001.interview_id}}"
             },
             "body": {
               "bodyType": "JSON",

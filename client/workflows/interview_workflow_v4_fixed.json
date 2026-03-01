@@ -59,7 +59,7 @@
           "inputs": {
             "apiInfo": {
               "method": "GET",
-              "url": "https://wehan-proxy.819264640.workers.dev/jobs/{{block_output_100001.job_id}}"
+              "url": "http://111.231.51.9/api/open/jobs/{{block_output_100001.job_id}}"
             },
             "body": {
               "bodyType": "EMPTY",
@@ -413,7 +413,7 @@
           "inputs": {
             "apiInfo": {
               "method": "POST",
-              "url": "https://wehan-proxy.819264640.workers.dev/interviews"
+              "url": "http://111.231.51.9/api/open/interviews"
             },
             "body": {
               "bodyType": "JSON",

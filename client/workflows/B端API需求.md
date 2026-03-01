@@ -1,8 +1,8 @@
 # C端工作流 - B端 API 需求文档
 
-> **更新时间**: 2026-02-28
+> **更新时间**: 2026-03-01
 > **用途**: 说明 C端 Coze 工作流需要调用的 B 端 API 接口
-> **生产环境**: `https://wehan.vercel.app`
+> **生产环境**: `http://111.231.51.9`
 > **API Key**: `wehan_open_api_key_2026`
 
 ---
@@ -285,7 +285,7 @@
 | 环境 | URL |
 |-----|-----|
 | 本地开发 | `http://localhost:3000` |
-| 生产环境 | `https://wehan.vercel.app` |
+| 生产环境 | `http://111.231.51.9` |
 
 ### 错误响应格式
 ```json
@@ -313,24 +313,52 @@
 ### 测试岗位 ID
 ```bash
 # 前端开发工程师 - 武汉光谷科技有限公司
-job_id: cmm5o5b8q000ezguj2h8ofvyj
+job_id: cmm6neue0000e2i9w94na7tp4
 
 # 后端开发工程师 - 武汉光谷科技有限公司
-job_id: cmm5o5b8q000fzguje6mp40ro
+job_id: cmm6neue0000f2i9w9bhkc4bk
 
 # AI算法工程师 - 武汉光谷科技有限公司
-job_id: cmm5o5b8r000gzguj0kl94ol3
+job_id: cmm6neue0000g2i9w61n1eb61
 ```
 
-### 测试用户 ID
+### 用户 ID 说明
+
+**扣子平台自动提供 `sys_uuid`**，无需用户手动输入：
+- 在工作流中直接使用 `{{sys_uuid}}` 系统变量
+- B 端 API 会自动将 sys_uuid 作为 externalUserId 存储
+
+**测试用 ID**（手动测试时使用）:
 ```bash
-# C端虚拟用户ID（推荐用于豆包/扣包测试）
-user_id: test_user_c_001
+# 扣子系统变量（推荐）
+user_id: {{sys_uuid}}  # 工作流中直接使用
 
-# B端实际用户ID（如需使用真实用户测试）
-user_id: cmm5o59nk0000zguj58iy4yko  # 管理员
-user_id: cmm5o5akd0004zgujcdb2fuuo  # 企业HR
+# 手动测试用 ID
+user_id: test_user_c_001  # C端虚拟用户
 ```
+
+### 测试面试记录 ID (已创建，可直接使用)
+```bash
+# 前端开发工程师面试 - test_user_c_001
+interview_id: cmm6oc5j00002cb9w0nck68lr
+
+# 包含 3 道题目:
+# q1: 请介绍一下你自己 (easy)
+# q2: 请说说你对 React 的理解 (medium)
+# q3: 描述一个你解决过的技术难题 (medium)
+```
+
+### 工作流2 测试数据 (面试答题)
+| 参数名 | 示例值 | 说明 |
+|-------|--------|------|
+| interview_id | `cmm6oc5j00002cb9w0nck68lr` | 面试记录 ID (已创建) |
+| question_index | `"0"` | 当前题目索引 (字符串类型，从 0 开始) |
+| user_answer | `"我叫张三，是一名前端开发工程师，有3年的 React 开发经验..."` | 用户回答内容 |
+
+### 工作流3 测试数据 (面试报告)
+| 参数名 | 示例值 | 说明 |
+|-------|--------|------|
+| interview_id | `cmm6oc5j00002cb9w0nck68lr` | 面试记录 ID (已创建) |
 
 ### API 路由状态
 - [x] `GET /api/open/jobs/:id` - ✅ 已实现
@@ -341,16 +369,16 @@ user_id: cmm5o5akd0004zgujcdb2fuuo  # 企业HR
 ### API 测试命令
 ```bash
 # 1. 测试获取岗位详情
-curl -X GET "https://wehan.vercel.app/api/open/jobs/cmm5o5b8q000ezguj2h8ofvyj" \
+curl -X GET "http://111.231.51.9/api/open/jobs/cmm6neue0000e2i9w94na7tp4" \
   -H "X-API-Key: wehan_open_api_key_2026"
 
 # 2. 测试创建面试记录
-curl -X POST "https://wehan.vercel.app/api/open/interviews" \
+curl -X POST "http://111.231.51.9/api/open/interviews" \
   -H "Content-Type: application/json" \
   -H "X-API-Key: wehan_open_api_key_2026" \
   -d '{
     "userId": "test_user_c_001",
-    "jobId": "cmm5o5b8q000ezguj2h8ofvyj",
+    "jobId": "cmm6neue0000e2i9w94na7tp4",
     "status": "IN_PROGRESS",
     "outline": [{"id":"q1","category":"专业","question":"请介绍一下你自己","difficulty":"easy"}],
     "currentIndex": 0,
@@ -358,11 +386,11 @@ curl -X POST "https://wehan.vercel.app/api/open/interviews" \
   }'
 
 # 3. 测试获取面试详情
-curl -X GET "https://wehan.vercel.app/api/open/interviews/{interview_id}" \
+curl -X GET "http://111.231.51.9/api/open/interviews/{interview_id}" \
   -H "X-API-Key: wehan_open_api_key_2026"
 
 # 4. 测试更新面试进度
-curl -X PATCH "https://wehan.vercel.app/api/open/interviews/{interview_id}" \
+curl -X PATCH "http://111.231.51.9/api/open/interviews/{interview_id}" \
   -H "Content-Type: application/json" \
   -H "X-API-Key: wehan_open_api_key_2026" \
   -d '{
@@ -372,7 +400,7 @@ curl -X PATCH "https://wehan.vercel.app/api/open/interviews/{interview_id}" \
       "questionIndex": 0,
       "question": "请介绍一下你自己",
       "answer": "我是...",
-      "timestamp": "2026-02-28T10:05:00.000Z"
+      "timestamp": "2026-03-01T10:05:00.000Z"
     }]
   }'
 ```
@@ -466,4 +494,4 @@ interface Job {
 
 ---
 
-*文档版本: 2.0 | 更新时间: 2026-02-28*
+*文档版本: 2.1 | 更新时间: 2026-03-01*

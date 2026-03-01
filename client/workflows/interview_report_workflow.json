@@ -57,7 +57,7 @@
           "inputs": {
             "apiInfo": {
               "method": "GET",
-              "url": "https://wehan-proxy.819264640.workers.dev/interviews/{{block_output_100001.interview_id}}"
+              "url": "http://111.231.51.9/api/open/interviews/{{block_output_100001.interview_id}}"
             },
             "body": {
               "bodyType": "EMPTY",
@@ -322,7 +322,7 @@
                 }
               }
             ],
-            "code": "async function main({ params }: Args): Promise<Output> {\n  const reportData = params.reportData;\n  \n  const requestBody = {\n    status: \"COMPLETED\",\n    totalScore: reportData.totalScore,\n    dimensions: reportData.dimensions || [],\n    highlights: reportData.highlights || [],\n    improvements: reportData.improvements || [],\n    suggestions: reportData.suggestions || \"\"\n  };\n  \n  return {\n    requestBodyJson: JSON.stringify(requestBody),\n    reportMarkdown: generateMarkdownReport(requestBody)\n  };\n\n  function generateMarkdownReport(data) {\n    let md = `# 面试评估报告\\n\\n`;\n    md += `## 综合评分\\n${data.totalScore}/100 分\\n\\n`;\n    \n    md += `## 各维度评分\\n`;\n    (data.dimensions || []).forEach(d => {\n      md += `- **${d.name}**: ${d.score}/${d.maxScore}\\n`;\n    });\n    md += `\\n`;\n    \n    if (data.highlights && data.highlights.length > 0) {\n      md += `## 亮点总结\\n`;\n      data.highlights.forEach(h => {\n        md += `- ${h.comment}\\n`;\n      });\n      md += `\\n`;\n    }\n    \n    if (data.improvements && data.improvements.length > 0) {\n      md += `## 改进建议\\n`;\n      data.improvements.forEach(i => {\n        md += `- **${i.area}**: ${i.suggestion}\\n`;\n      });\n      md += `\\n`;\n    }\n    \n    md += `## 整体建议\\n${data.suggestions}\\n`;\n    \n    return md;\n  }",
+            "code": "async function main({ params }: Args): Promise<Output> {\n  let reportData = params.reportData;\n  \n  if (typeof reportData === 'string') {\n    try {\n      reportData = JSON.parse(reportData);\n    } catch (e) {\n      reportData = { totalScore: 60, dimensions: [], highlights: [], improvements: [], suggestions: \"\" };\n    }\n  }\n  \n  const score = reportData.totalScore || 60;\n  const dims = reportData.dimensions || [];\n  const highs = reportData.highlights || [];\n  const imps = reportData.improvements || [];\n  const sugg = reportData.suggestions || \"\";\n  \n  const requestBody = {\n    status: \"COMPLETED\",\n    totalScore: score,\n    dimensions: dims,\n    highlights: highs,\n    improvements: imps,\n    suggestions: sugg\n  };\n  \n  let md = \"# 面试评估报告\\n\\n\";\n  md += \"## 综合评分\\n\" + score + \"/100 分\\n\\n\";\n  md += \"## 各维度评分\\n\";\n  for (let i = 0; i < dims.length; i++) {\n    md += \"- **\" + dims[i].name + \"**: \" + dims[i].score + \"/\" + dims[i].maxScore + \"\\n\";\n  }\n  md += \"\\n\";\n  if (highs.length > 0) {\n    md += \"## 亮点总结\\n\";\n    for (let i = 0; i < highs.length; i++) {\n      md += \"- \" + highs[i].comment + \"\\n\";\n    }\n    md += \"\\n\";\n  }\n  if (imps.length > 0) {\n    md += \"## 改进建议\\n\";\n    for (let i = 0; i < imps.length; i++) {\n      md += \"- **\" + imps[i].area + \"**: \" + imps[i].suggestion + \"\\n\";\n    }\n    md += \"\\n\";\n  }\n  md += \"## 整体建议\\n\" + sugg + \"\\n\";\n  \n  return {\n    requestBodyJson: JSON.stringify(requestBody),\n    reportMarkdown: md\n  };\n}",
             "language": 5,
             "settingOnError": { "processType": 1, "timeoutMs": 60000, "retryTimes": 0 }
           },
@@ -357,7 +357,7 @@
           "inputs": {
             "apiInfo": {
               "method": "PATCH",
-              "url": "https://wehan-proxy.819264640.workers.dev/interviews/{{block_output_100001.interview_id}}"
+              "url": "http://111.231.51.9/api/open/interviews/{{block_output_100001.interview_id}}"
             },
             "body": {
               "bodyType": "JSON",

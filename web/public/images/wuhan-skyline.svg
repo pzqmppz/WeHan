@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 黄鹤楼 -->
+  <g transform="translate(50, 20)">
+    <!-- 底座 -->
+    <rect x="20" y="150" width="60" height="10"/>
+    <!-- 第一层 -->
+    <path d="M15 150 L40 130 L85 150"/>
+    <rect x="30" y="130" width="40" height="20"/>
+    <!-- 第二层 -->
+    <path d="M20 130 L40 110 L80 130"/>
+    <rect x="35" y="110" width="30" height="20"/>
+    <!-- 第三层 -->
+    <path d="M25 110 L40 90 L75 110"/>
+    <rect x="38" y="90" width="24" height="20"/>
+    <!-- 顶层 -->
+    <path d="M30 90 L50 70 L70 90"/>
+    <line x1="50" y1="70" x2="50" y2="50"/>
+    <circle cx="50" cy="45" r="5"/>
+  </g>
+
+  <!-- 长江大桥 -->
+  <g transform="translate(140, 100)">
+    <!-- 桥面 -->
+    <line x1="0" y1="50" x2="150" y2="50" stroke-width="3"/>
+    <!-- 桥墩 -->
+    <line x1="30" y1="50" x2="30" y2="80"/>
+    <line x1="75" y1="50" x2="75" y2="80"/>
+    <line x1="120" y1="50" x2="120" y2="80"/>
+    <!-- 桥塔 -->
+    <line x1="75" y1="50" x2="75" y2="0"/>
+    <line x1="65" y1="10" x2="85" y2="10"/>
+    <!-- 斜拉索 -->
+    <line x1="75" y1="10" x2="20" y2="50" stroke-width="1"/>
+    <line x1="75" y1="10" x2="45" y2="50" stroke-width="1"/>
+    <line x1="75" y1="10" x2="105" y2="50" stroke-width="1"/>
+    <line x1="75" y1="10" x2="135" y2="50" stroke-width="1"/>
+  </g>
+
+  <!-- 高楼群 1 -->
+  <g transform="translate(300, 60)">
+    <!-- 大楼 A -->
+    <rect x="0" y="30" width="40" height="110"/>
+    <line x1="5" y1="40" x2="35" y2="40"/>
+    <line x1="5" y1="55" x2="35" y2="55"/>
+    <line x1="5" y1="70" x2="35" y2="70"/>
+    <line x1="5" y1="85" x2="35" y2="85"/>
+    <line x1="5" y1="100" x2="35" y2="100"/>
+    <line x1="5" y1="115" x2="35" y2="115"/>
+    <!-- 大楼 B -->
+    <rect x="50" y="50" width="35" height="90"/>
+    <rect x="55" y="45" width="25" height="5"/>
+    <line x1="55" y1="60" x2="80" y2="60"/>
+    <line x1="55" y1="75" x2="80" y2="75"/>
+    <line x1="55" y1="90" x2="80" y2="90"/>
+    <line x1="55" y1="105" x2="80" y2="105"/>
+    <line x1="55" y1="120" x2="80" y2="120"/>
+  </g>
+
+  <!-- 高楼群 2 -->
+  <g transform="translate(400, 40)">
+    <!-- 地标塔 -->
+    <rect x="20" y="50" width="30" height="110"/>
+    <polygon points="35,50 20,50 25,30 45,30 50,50"/>
+    <line x1="35" y1="30" x2="35" y2="10"/>
+    <circle cx="35" cy="8" r="4"/>
+    <!-- 大楼 C -->
+    <rect x="60" y="70" width="45" height="90"/>
+    <line x1="65" y1="80" x2="100" y2="80"/>
+    <line x1="65" y1="95" x2="100" y2="95"/>
+    <line x1="65" y1="110" x2="100" y2="110"/>
+    <line x1="65" y1="125" x2="100" y2="125"/>
+    <line x1="65" y1="140" x2="100" y2="140"/>
+  </g>
+
+  <!-- 高楼群 3 -->
+  <g transform="translate(520, 70)">
+    <!-- 大楼 D -->
+    <rect x="0" y="40" width="35" height="90"/>
+    <line x1="5" y1="50" x2="30" y2="50"/>
+    <line x1="5" y1="65" x2="30" y2="65"/>
+    <line x1="5" y1="80" x2="30" y2="80"/>
+    <line x1="5" y1="95" x2="30" y2="95"/>
+    <line x1="5" y1="110" x2="30" y2="110"/>
+    <!-- 大楼 E -->
+    <rect x="45" y="60" width="40" height="70"/>
+    <polygon points="65,60 45,60 50,45 80,45 85,60"/>
+    <line x1="50" y1="70" x2="80" y2="70"/>
+    <line x1="50" y1="85" x2="80" y2="85"/>
+    <line x1="50" y1="100" x2="80" y2="100"/>
+    <line x1="50" y1="115" x2="80" y2="115"/>
+  </g>
+
+  <!-- 江面波浪 -->
+  <g transform="translate(0, 165)">
+    <path d="M0 10 Q20 0 40 10 T80 10 T120 10 T160 10 T200 10 T240 10 T280 10 T320 10 T360 10 T400 10 T440 10 T480 10 T520 10 T560 10 T600 10 T640 10 T680 10 T720 10 T760 10 T800 10" stroke-width="1" opacity="0.5"/>
+    <path d="M0 20 Q25 12 50 20 T100 20 T150 20 T200 20 T250 20 T300 20 T350 20 T400 20 T450 20 T500 20 T550 20 T600 20 T650 20 T700 20 T750 20 T800 20" stroke-width="1" opacity="0.3"/>
+  </g>
+
+  <!-- 远景高楼剪影 -->
+  <g transform="translate(620, 80)" opacity="0.6">
+    <rect x="0" y="50" width="25" height="70"/>
+    <rect x="30" y="30" width="20" height="90"/>
+    <rect x="55" y="55" width="30" height="65"/>
+    <rect x="90" y="40" width="25" height="80"/>
+    <rect x="120" y="60" width="35" height="60"/>
+  </g>
+
+  <!-- 点缀元素 - 云朵 -->
+  <g opacity="0.4">
+    <ellipse cx="100" cy="30" rx="25" ry="10"/>
+    <ellipse cx="85" cy="25" rx="15" ry="8"/>
+    <ellipse cx="115" cy="28" rx="18" ry="7"/>
+  </g>
+  <g opacity="0.3" transform="translate(500, 0)">
+    <ellipse cx="100" cy="25" rx="20" ry="8"/>
+    <ellipse cx="88" cy="22" rx="12" ry="6"/>
+    <ellipse cx="112" cy="23" rx="15" ry="5"/>
+  </g>
+</svg>
