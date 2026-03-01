@@ -2,6 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Layout, Row, Col, Card, Statistic, Button, Typography, Space, Spin, Tag } from 'antd'
 import {
   TeamOutlined,
@@ -74,37 +75,72 @@ export default function HomePage() {
       <PortalHeader />
 
       {/* Hero Section */}
-      <Content>
-        <div className="bg-gradient-to-r from-blue-600 to-blue-400 text-white py-20">
-          <div className="max-w-6xl mx-auto px-8">
+      <Content className="!p-0">
+        <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 text-white py-20 min-h-[500px]">
+          {/* 装饰性光晕 */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-400/20 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+
+          {/* 武汉城市天际线 - 右下角装饰 */}
+          <div className="absolute bottom-0 right-0 w-1/2 h-full opacity-20 pointer-events-none">
+            <Image
+              src="/images/wuhan-skyline.png"
+              alt="武汉城市天际线"
+              fill
+              className="object-cover object-right-bottom"
+              priority
+            />
+          </div>
+
+          <div className="relative max-w-6xl mx-auto px-8">
             <Row gutter={48} align="middle">
               <Col xs={24} md={14}>
-                <Title level={1} className="!text-white !mb-4">
+                <Title
+                  level={1}
+                  className="!text-white !mb-4 !text-5xl"
+                  style={{ textShadow: '0 2px 20px rgba(0,0,0,0.2)' }}
+                >
                   才聚江城
                 </Title>
-                <Title level={2} className="!text-white/90 !font-normal !mt-0 !mb-6">
+                <Title
+                  level={2}
+                  className="!text-white/90 !font-normal !mt-0 !mb-6"
+                  style={{ textShadow: '0 1px 10px rgba(0,0,0,0.15)' }}
+                >
                   武汉人才留汉智能服务平台
                 </Title>
-                <Paragraph className="!text-white/80 text-lg mb-8">
+                <Paragraph className="!text-white/80 text-lg mb-8 max-w-xl">
                   连接武汉高校人才与本地企业，帮助武汉大学生留在武汉就业，
                   帮助武汉企业找到本地人才。
                 </Paragraph>
                 <Space size="large">
                   <Link href="/register">
-                    <Button type="primary" size="large" icon={<ArrowRightOutlined />}>
+                    <Button
+                      type="primary"
+                      size="large"
+                      className="h-12 px-8 text-lg font-medium bg-white !text-blue-600 hover:bg-white/90 hover:scale-105 transition-all shadow-lg"
+                      icon={<ArrowRightOutlined />}
+                    >
                       立即注册
                     </Button>
                   </Link>
                   <Link href="/login">
-                    <Button ghost size="large">
+                    <Button
+                      ghost
+                      size="large"
+                      className="h-12 px-8 text-lg font-medium border-white/50 hover:bg-white/10"
+                    >
                       企业登录
                     </Button>
                   </Link>
                 </Space>
               </Col>
               <Col xs={24} md={10} className="hidden md:block">
-                <div className="bg-white/10 rounded-2xl p-8 backdrop-blur">
-                  <Title level={4} className="!text-white !mb-4">平台数据</Title>
+                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 shadow-xl">
+                  <Title level={4} className="!text-white !mb-6 flex items-center gap-2">
+                    <ThunderboltOutlined className="text-yellow-300" />
+                    平台数据
+                  </Title>
                   {loading ? (
                     <div className="flex justify-center py-8">
                       <Spin />
@@ -113,12 +149,10 @@ export default function HomePage() {
                     <Row gutter={[16, 16]}>
                       {stats.map((stat) => (
                         <Col span={12} key={stat.title}>
-                          <Statistic
-                            title={<span className="text-white/80">{stat.title}</span>}
-                            value={stat.value}
-                            suffix={stat.suffix}
-                            valueStyle={{ color: '#fff' }}
-                          />
+                          <div className="text-center p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+                            <div className="text-3xl font-bold text-white">{stat.value}<span className="text-lg text-white/70">{stat.suffix}</span></div>
+                            <div className="text-white/70 text-sm mt-1">{stat.title}</div>
+                          </div>
                         </Col>
                       ))}
                     </Row>
