@@ -58,6 +58,8 @@ WeHan/
 │   │   │   │   ├── jobs/         # 岗位 API
 │   │   │   │   ├── applications/ # 投递 API
 │   │   │   │   ├── policies/     # 政策 API
+│   │   │   │   ├── coze/         # Coze 专用 API
+│   │   │   │   │   └── question/ # 多轮问询接口
 │   │   │   │   └── open/         # 开放 API (C端调用)
 │   │   │   ├── layout.tsx
 │   │   │   └── page.tsx
@@ -249,7 +251,7 @@ npx prisma db seed     # 填充种子数据
 ## 环境变量
 
 ```env
-# 数据库
+# 数据库（自托管 PostgreSQL）
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/wehan?schema=public"
 
 # NextAuth
@@ -266,17 +268,29 @@ OPEN_API_KEY="your-api-key-for-coze"
 
 ---
 
+## 部署说明
+
+| 组件 | 部署方式 | 说明 |
+|-----|---------|------|
+| **B 端 Web** | 自托管服务器 | Next.js 应用部署在自有服务器 |
+| **数据库** | 自托管 PostgreSQL | 数据库部署在同一服务器，无云服务依赖 |
+| **C 端智能体** | 扣子平台 (SaaS) | 智能体托管在扣子平台，通过 API 调用 B 端 |
+
+---
+
 ## 文档索引
 
 | 文档 | 路径 | 说明 |
 |-----|------|------|
 | **设计系统** | [docs/design-system.md](./docs/design-system.md) | **UI/样式统一规范 (必读)** |
+| **生产部署** | [docs/deployment-production.md](./docs/deployment-production.md) | **服务器配置 + 运维指南** |
 | PRD | [PRD-武汉人才留汉智能服务平台.md](./PRD-武汉人才留汉智能服务平台.md) | 产品需求 |
 | 总体架构 | [codemaps/architecture.md](./codemaps/architecture.md) | B+C 端整合架构 |
 | B 端框架 | [codemaps/backend-portal.md](./codemaps/backend-portal.md) | Next.js 开发指南 |
 | C 端框架 | [codemaps/frontend-client.md](./codemaps/frontend-client.md) | 扣子开发指南 |
 | 数据模型 | [codemaps/data-models.md](./codemaps/data-models.md) | Prisma Schema 详解 |
 | 扣子文档 | [docs/coze/README.md](./docs/coze/README.md) | 平台使用指南 |
+| 多轮问询插件 | [docs/coze/04-插件开发.md](./docs/coze/04-插件开发.md) | CozeQuestionSession 使用 |
 | 火山引擎 | [docs/volcengine/README.md](./docs/volcengine/README.md) | 语音 API |
 
 ---

@@ -2,7 +2,7 @@
 
 > 武汉人才留汉智能服务平台 - B 端 + C 端完整技术架构
 
-**更新时间**: 2026-02-28 | **版本**: 3.0
+**更新时间**: 2026-03-02 | **版本**: 3.1
 
 ---
 
@@ -287,8 +287,8 @@ web/src/
 | 环境 | B 端 | C 端 |
 |-----|------|------|
 | 开发 | localhost:3000 | 扣子预览模式 |
-| 测试 | test.wehan.com | 豆包测试版 |
-| 生产 | www.wehan.com | 豆包正式版 |
+| 生产 | http://111.231.51.9:9000 | http://111.231.51.9:8080 |
+| 生产(域名) | https://rcjc.dolosy.cn | https://wehan.dolosy.cn (待备案) |
 
 ### 6.2 联调检查点
 
@@ -334,19 +334,19 @@ web/src/
 │  └─────────────────────────┬───────────────────────────┘   │
 │                            │                               │
 │  ┌─────────────────────────▼───────────────────────────┐   │
-│  │                  Vercel / 云服务器                    │   │
+│  │              自托管服务器 (Self-Hosted)              │   │
 │  │                                                      │   │
 │  │   ┌─────────────┐    ┌─────────────┐                │   │
 │  │   │  Next.js    │    │  API Routes │                │   │
 │  │   │  (SSR/SSG)  │    │  /api/*     │                │   │
 │  │   └─────────────┘    └─────────────┘                │   │
 │  │                                                      │   │
-│  └─────────────────────────┬───────────────────────────┘   │
-│                            │                               │
-│  ┌─────────────────────────▼───────────────────────────┐   │
-│  │                  PostgreSQL                          │   │
-│  │              (云数据库 / Supabase)                    │   │
-│  └─────────────────────────────────────────────────────┘   │
+│  │   ┌─────────────────────────────────────────────┐   │   │
+│  │   │              PostgreSQL                      │   │   │
+│  │   │          (同服务器本地部署)                   │   │   │
+│  │   └─────────────────────────────────────────────┘   │   │
+│  │                                                      │   │
+│  └──────────────────────────────────────────────────────┘   │
 │                                                             │
 │  ┌─────────────────────────────────────────────────────┐   │
 │  │              扣子平台 (SaaS)                         │   │
@@ -358,6 +358,11 @@ web/src/
 └─────────────────────────────────────────────────────────────┘
 ```
 
+**部署说明**:
+- B 端 Web 应用和 PostgreSQL 数据库均部署在自有服务器
+- 不依赖任何云数据库服务（如 Supabase、Neon 等）
+- C 端智能体托管在扣子平台，通过 HTTP 插件调用 B 端 API
+
 ---
 
 ## 八、数据库环境配置
@@ -366,7 +371,7 @@ web/src/
 
 | 文件 | 用途 | Git 状态 |
 |-----|------|---------|
-| `.env` | 实际配置（本地/云端） | ❌ 不提交 |
+| `.env` | 实际配置 | ❌ 不提交 |
 | `.env.example` | 配置模板 | ✅ 提交 |
 | `.env.local` | 本地覆盖配置 | ❌ 不提交 |
 
@@ -374,26 +379,21 @@ web/src/
 
 | 环境 | 变量 | 说明 |
 |-----|------|------|
-| 云端开发 | `DATABASE_URL` | Supabase 连接字符串 |
-| 本地开发 | `DATABASE_URL` | 本地 PostgreSQL |
+| 生产环境 | `DATABASE_URL` | 自托管服务器 PostgreSQL 连接字符串 |
+| 本地开发 | `DATABASE_URL` | 本地开发机 PostgreSQL 或连接远程测试库 |
 
-### 8.3 配置切换
+### 8.3 配置示例
 
 ```bash
-# 使用云端数据库（Supabase）
-DATABASE_URL="postgresql://postgres.xxx:密码@xxx.pooler.supabase.com:5432/postgres"
+# 生产环境（自托管服务器 - 数据库与应用在同一服务器）
+DATABASE_URL="postgresql://postgres:password@localhost:5432/wehan?schema=public"
 
-# 使用本地数据库
-# DATABASE_URL="postgresql://postgres:postgres@localhost:5432/wehan?schema=public"
+# 本地开发（连接自托管服务器的数据库）
+DATABASE_URL="postgresql://postgres:password@your-server-ip:5432/wehan?schema=public"
+
+# 本地开发（使用本地 PostgreSQL）
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/wehan?schema=public"
 ```
-
-### 8.4 云服务商
-
-| 服务商 | 免费额度 | 当前使用 |
-|-------|---------|---------|
-| Supabase | 500MB | ✅ 已配置 |
-| Neon | 3GB | 备选 |
-| 本地 PostgreSQL | 无限制 | 本地部署用 |
 
 ### 8.5 关键环境变量
 
@@ -448,9 +448,74 @@ DATABASE_URL="postgresql://postgres.xxx:密码@xxx.pooler.supabase.com:5432/post
 
 ---
 
-## 十、安全策略
+## 十、Coze 多轮问询接口
 
-### 10.1 认证与授权
+### 10.1 概述
+
+由于扣子智能体的变量记忆机制不够可靠，我们设计了基于数据库的多轮问询状态管理方案。
+
+**核心表**: `CozeQuestionSession` - 存储问答会话状态
+
+**API 端点**:
+| 接口 | 路径 | 用途 |
+|-----|------|------|
+| 初始化 | `POST /api/coze/question/init` | 工作流生成问题后调用 |
+| 下一题 | `POST /api/coze/question/next` | 记录回答并获取下一题 |
+| 强制结束 | `POST /api/coze/question/force-finish` | 用户中途退出时调用 |
+
+### 10.2 调用流程
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    多轮问询流程                              │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌──────────────┐                                           │
+│  │ 工作流一生成  │                                           │
+│  │ 面试问题     │                                           │
+│  └──────┬───────┘                                           │
+│         │                                                   │
+│         ▼                                                   │
+│  ┌──────────────┐     ┌───────────────────────────┐        │
+│  │ POST /init   │────►│ CozeQuestionSession       │        │
+│  │ questions[]  │     │ • sessionId               │        │
+│  └──────────────┘     │ • questions: ["Q1", "Q2"] │        │
+│                       │ • answers: []             │        │
+│                       │ • currentIdx: 0           │        │
+│                       └───────────────────────────┘        │
+│         │                                                   │
+│         ▼ 返回第一题                                        │
+│  ┌──────────────┐                                          │
+│  │ 智能体提问   │                                          │
+│  │ "Q1: ..."    │                                          │
+│  └──────┬───────┘                                          │
+│         │                                                   │
+│         ▼ 用户回答                                          │
+│  ┌──────────────┐     ┌───────────────────────────┐        │
+│  │ POST /next   │────►│ 更新 answers: ["A1"]      │        │
+│  │ answer: "A1" │     │ currentIdx: 1             │        │
+│  └──────────────┘     └───────────────────────────┘        │
+│         │                                                   │
+│         ▼ 返回下一题或完成标志                              │
+│  ┌──────────────┐                                          │
+│  │ 继续提问或   │                                          │
+│  │ 返回完整数据 │                                          │
+│  └──────────────┘                                          │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 10.3 OpenAPI 规范
+
+详见: `client/openapi/question_plugin.yaml`
+
+**鉴权方式**: `X-API-Key` Header（与开放 API 共用密钥）
+
+---
+
+## 十一、安全策略
+
+### 11.1 认证与授权
 
 | 层级 | 方式 | 说明 |
 |-----|------|-----|
@@ -459,7 +524,7 @@ DATABASE_URL="postgresql://postgres.xxx:密码@xxx.pooler.supabase.com:5432/post
 | 开放 API | API Key | 扣子插件专用 |
 | C 端用户 | 豆包账号体系 | 由豆包管理 |
 
-### 10.2 数据安全
+### 11.2 数据安全
 
 | 措施 | 说明 |
 |-----|------|
@@ -471,13 +536,14 @@ DATABASE_URL="postgresql://postgres.xxx:密码@xxx.pooler.supabase.com:5432/post
 
 ---
 
-## 十一、文档索引
+## 十二、文档索引
 
 | 文档 | 路径 | 说明 |
 |-----|------|------|
 | B 端技术框架 | [codemaps/backend-portal.md](./backend-portal.md) | 分层架构 + 设计系统 |
 | C 端技术框架 | [codemaps/frontend-client.md](./frontend-client.md) | 扣子 + 豆包 |
 | 数据模型 | [codemaps/data-models.md](./data-models.md) | Prisma Schema |
+| **生产部署** | [docs/deployment-production.md](../docs/deployment-production.md) | 服务器配置 + 运维指南 |
 | 设计系统 | [docs/design-system.md](../docs/design-system.md) | UI/UX 规范 |
 | 扣子文档 | [docs/coze/README.md](../docs/coze/README.md) | 平台使用指南 |
 | 火山引擎文档 | [docs/volcengine/README.md](../docs/volcengine/README.md) | 语音 API |
@@ -485,5 +551,5 @@ DATABASE_URL="postgresql://postgres.xxx:密码@xxx.pooler.supabase.com:5432/post
 
 ---
 
-*文档版本: 3.0 | 更新时间: 2026-02-28*
-*变更: 纯 B 端 API 架构（移除知识库依赖）、API 测试验证结果、架构变更记录*
+*文档版本: 3.2 | 更新时间: 2026-03-02*
+*变更: 更新生产环境地址、新增部署文档链接*
