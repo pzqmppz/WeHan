@@ -323,3 +323,18 @@ enum UserStatus {
   PENDING
   REJECTED
 }
+
+// Coze 多轮问询会话管理（用于解决智能体变量记忆不可靠问题）
+model CozeQuestionSession {
+  sessionId   String   @id @db.VarChar(64) // Coze 内置的会话 ID
+  questions   Json                  // 问题数组
+  answers     Json     @default("[]") // 回答数组（初始为空）
+  currentIdx  Int      @default(0)   // 当前索引（从 0 开始）
+  isFinish    Boolean  @default(false) // 是否完成
+  expiredAt   DateTime               // 过期时间（30分钟后）
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([expiredAt])
+  @@index([isFinish])
+}

@@ -1,0 +1,395 @@
+openapi: 3.0.0
+info:
+  title: WeHan 多轮问询控制器
+  description: |
+    用于 WeHan 求职助手智能体，管理多轮面试提问流程。
+
+    核心功能：
+    - 接收问题数组，按序提问
+    - 记录用户回答
+    - 问答结束后返回完整问答数据
+
+    使用场景：
+    1. 工作流一调用 init 接口初始化会话
+    2. 智能体在对话循环中调用 next 接口记录回答并获取下一题
+    3. 用户中途退出时调用 force-finish 接口强制结束
+  version: 1.0.0
+  contact:
+    name: WeHan Team
+
+servers:
+  - url: https://your-domain.com/api/coze/question
+    description: 生产环境
+  - url: http://localhost:3000/api/coze/question
+    description: 开发环境
+
+security:
+  - ApiKeyAuth: []
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API 密钥，从 WeHan B 端获取
+
+  schemas:
+    # 通用响应结构
+    BaseResponse:
+      type: object
+      required:
+        - code
+        - msg
+      properties:
+        code:
+          type: integer
+          description: 状态码，200 表示成功
+          example: 200
+        msg:
+          type: string
+          description: 响应消息
+          example: success
+        data:
+          type: object
+          description: 响应数据
+
+    # Init 请求
+    InitRequest:
+      type: object
+      required:
+        - session_id
+        - questions
+      properties:
+        session_id:
+          type: string
+          description: Coze 会话 ID
+          example: coze_xxxxxx
+        questions:
+          type: array
+          description: 问题数组
+          items:
+            type: string
+          minItems: 1
+          example:
+            - "请介绍一下你自己"
+            - "你为什么选择这个岗位"
+            - "你的优势是什么"
+
+    # Init 响应数据
+    InitResponseData:
+      type: object
+      properties:
+        current_question:
+          type: string
+          description: 当前问题（第一题）
+          example: "请介绍一下你自己"
+        current_idx:
+          type: integer
+          description: 当前索引（从 0 开始）
+          example: 0
+        is_finish:
+          type: boolean
+          description: 是否已完成所有问题
+          example: false
+        total_questions:
+          type: integer
+          description: 问题总数
+          example: 6
+
+    # Next 请求
+    NextRequest:
+      type: object
+      required:
+        - session_id
+        - answer
+      properties:
+        session_id:
+          type: string
+          description: Coze 会话 ID
+          example: coze_xxxxxx
+        answer:
+          type: string
+          description: 用户的回答
+          example: "我叫张三，是一名应届毕业生..."
+
+    # Next 响应数据（未完成）
+    NextResponseDataContinue:
+      type: object
+      properties:
+        current_question:
+          type: string
+          description: 下一个问题
+          example: "你为什么选择这个岗位"
+        current_idx:
+          type: integer
+          description: 当前索引
+          example: 1
+        is_finish:
+          type: boolean
+          description: 是否已完成所有问题
+          example: false
+
+    # Next 响应数据（已完成）
+    NextResponseDataFinished:
+      type: object
+      properties:
+        is_finish:
+          type: boolean
+          description: 是否已完成所有问题
+          example: true
+        questions:
+          type: array
+          description: 完整问题数组
+          items:
+            type: string
+          example:
+            - "请介绍一下你自己"
+            - "你为什么选择这个岗位"
+        answers:
+          type: array
+          description: 完整回答数组
+          items:
+            type: string
+          example:
+            - "我叫张三..."
+            - "我选择这个岗位是因为..."
+
+    # Force-finish 请求
+    ForceFinishRequest:
+      type: object
+      required:
+        - session_id
+      properties:
+        session_id:
+          type: string
+          description: Coze 会话 ID
+          example: coze_xxxxxx
+
+    # Force-finish 响应数据
+    ForceFinishResponseData:
+      type: object
+      properties:
+        is_finish:
+          type: boolean
+          description: 是否已完成
+          example: true
+        questions:
+          type: array
+          description: 已提问的问题
+          items:
+            type: string
+          example:
+            - "请介绍一下你自己"
+        answers:
+          type: array
+          description: 已记录的回答
+          items:
+            type: string
+          example:
+            - "我叫张三..."
+        unfinished_questions:
+          type: array
+          description: 未提问的问题
+          items:
+            type: string
+          example:
+            - "你为什么选择这个岗位"
+            - "你的优势是什么"
+        total_questions:
+          type: integer
+          description: 问题总数
+          example: 6
+        completed_count:
+          type: integer
+          description: 已完成数量
+          example: 1
+
+paths:
+  /init:
+    post:
+      operationId: initSession
+      summary: 初始化会话
+      description: |
+        接收工作流生成的问题数组，初始化会话，返回第一个问题。
+
+        调用时机：工作流一（generate_questions_workflow）生成问题后调用
+      tags:
+        - 会话管理
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InitRequest'
+      responses:
+        '200':
+          description: 初始化成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/InitResponseData'
+              example:
+                code: 200
+                msg: success
+                data:
+                  current_question: "请介绍一下你自己"
+                  current_idx: 0
+                  is_finish: false
+                  total_questions: 6
+        '400':
+          description: 参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+              example:
+                code: 400
+                msg: "questions 必须是非空数组"
+                data: null
+        '401':
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+              example:
+                code: 401
+                msg: "无效的 API Key"
+                data: null
+
+  /next:
+    post:
+      operationId: nextQuestion
+      summary: 记录回答并返回下一题
+      description: |
+        接收用户回答，更新回答数组，返回下一个问题或完整数组。
+
+        调用时机：用户回答后，智能体调用此接口
+
+        返回逻辑：
+        - 若还有下一题：返回 current_question + is_finish: false
+        - 若所有问题已完成：返回 questions + answers + is_finish: true
+      tags:
+        - 会话管理
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NextRequest'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      data:
+                        oneOf:
+                          - $ref: '#/components/schemas/NextResponseDataContinue'
+                          - $ref: '#/components/schemas/NextResponseDataFinished'
+              examples:
+                continue:
+                  summary: 继续提问
+                  value:
+                    code: 200
+                    msg: success
+                    data:
+                      current_question: "你为什么选择这个岗位"
+                      current_idx: 1
+                      is_finish: false
+                finished:
+                  summary: 所有问题完成
+                  value:
+                    code: 200
+                    msg: "all questions finished"
+                    data:
+                      is_finish: true
+                      questions:
+                        - "请介绍一下你自己"
+                        - "你为什么选择这个岗位"
+                      answers:
+                        - "我叫张三..."
+                        - "我选择这个岗位是因为..."
+        '404':
+          description: 会话不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+              example:
+                code: 404
+                msg: "会话不存在，请先调用 init 接口"
+                data: null
+        '410':
+          description: 会话已过期
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+              example:
+                code: 410
+                msg: "会话已过期"
+                data: null
+
+  /force-finish:
+    post:
+      operationId: forceFinish
+      summary: 强制结束会话
+      description: |
+        用户中途退出时，强制结束会话并返回已完成的数据。
+
+        调用时机：用户说「结束面试」「不想回答了」等终止指令时
+      tags:
+        - 会话管理
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForceFinishRequest'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ForceFinishResponseData'
+              example:
+                code: 200
+                msg: "会话已强制结束"
+                data:
+                  is_finish: true
+                  questions:
+                    - "请介绍一下你自己"
+                  answers:
+                    - "我叫张三..."
+                  unfinished_questions:
+                    - "你为什么选择这个岗位"
+                    - "你的优势是什么"
+                  total_questions: 6
+                  completed_count: 1
+        '404':
+          description: 会话不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+              example:
+                code: 404
+                msg: "会话不存在"
+                data: null
