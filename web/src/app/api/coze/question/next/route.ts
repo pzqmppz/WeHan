@@ -34,7 +34,7 @@ function validateApiKey(request: NextRequest): { valid: boolean; error?: string 
 /**
  * 请求体 Schema
  */
-interface NextRequest {
+interface NextRequestBody {
   session_id: string
   answer: string
 }
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
 
   try {
     // 2. 解析请求体
-    const body: NextRequest = await request.json()
+    const body: NextRequestBody = await request.json()
     const { session_id, answer } = body
 
     // 3. 参数校验
