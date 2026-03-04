@@ -2,7 +2,7 @@
 
 > PostgreSQL + Prisma ORM 数据模型设计
 
-**更新时间**: 2026-02-28
+**更新时间**: 2026-03-02
 
 ---
 
@@ -453,6 +453,82 @@ model EmotionRecord {
 
 ---
 
+### 2.9 CozeQuestionSession (Coze 多轮问询会话)
+
+```prisma
+model CozeQuestionSession {
+  sessionId   String   @id @db.VarChar(64) // Coze 内置的会话 ID
+  questions   Json                  // 问题数组
+  answers     Json     @default("[]") // 回答数组（初始为空）
+  currentIdx  Int      @default(0)   // 当前索引（从 0 开始）
+  isFinish    Boolean  @default(false) // 是否完成
+  expiredAt   DateTime               // 过期时间（30分钟后）
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([expiredAt])
+  @@index([isFinish])
+}
+```
+
+**设计背景**:
+由于扣子智能体的变量记忆机制不够可靠，我们设计了基于数据库的多轮问询状态管理方案。
+
+**字段说明**:
+
+| 字段 | 类型 | 说明 |
+|-----|------|------|
+| sessionId | String | Coze 会话 ID（主键） |
+| questions | Json | 问题数组 `string[]` |
+| answers | Json | 回答数组 `string[]`（初始为空） |
+| currentIdx | Int | 当前问题索引（从 0 开始） |
+| isFinish | Boolean | 是否已完成所有问题 |
+| expiredAt | DateTime | 会话过期时间（30分钟） |
+
+**使用场景**:
+1. 工作流一生成面试问题后，调用 `/api/coze/question/init` 初始化会话
+2. 智能体在对话中调用 `/api/coze/question/next` 记录回答并获取下一题
+3. 用户中途退出时调用 `/api/coze/question/force-finish` 强制结束
+
+**关联 API**:
+- `POST /api/coze/question/init` - 初始化会话
+- `POST /api/coze/question/next` - 记录回答并返回下一题
+- `POST /api/coze/question/force-finish` - 强制结束会话
+
+---
+
+### 2.10 Conversation (C 端会话)
+
+```prisma
+model Conversation {
+  id                  String   @id @default(cuid())
+  externalUserId      String   // 豆包用户ID
+  cozeConversationId  String   @unique // Coze会话ID
+  title               String?
+  status              String   @default("active") // active/finished/interrupted
+  type                String?  // interview/counseling/general
+  sessionData         Json?    // 完整会话数据（messages, workflowStatus等）
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([externalUserId])
+  @@index([cozeConversationId])
+  @@index([status])
+}
+```
+
+**字段说明**:
+
+| 字段 | 类型 | 说明 |
+|-----|------|------|
+| externalUserId | String | 豆包用户 ID（不关联 User 表） |
+| cozeConversationId | String | Coze 会话 ID（唯一） |
+| status | String | 会话状态：active/finished/interrupted |
+| type | String | 会话类型：面试/心理咨询/通用 |
+| sessionData | Json | 完整会话数据（消息列表、工作流状态等） |
+
+---
+
 ## 三、索引策略
 
 ### 3.1 主键索引
@@ -593,4 +669,4 @@ npx prisma validate
 
 ---
 
-*文档版本: 1.1 | 生成时间: 2026-02-28*
+*文档版本: 1.2 | 生成时间: 2026-03-02*

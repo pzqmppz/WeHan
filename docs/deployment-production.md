@@ -19,7 +19,7 @@
 | SSH 密码/私钥 | 认证方式 | 密码或 `.pem` 文件 |
 | 数据库密码 | PostgreSQL 连接 | 见服务器 `.env` 文件 |
 
-### 配置 SSH 快捷连接（推荐）
+### 配置 SSH 快捷连接（推荐-密钥在系统目录C:\Users\Admin\.ssh\config）
 
 **本地配置文件**: `~/.ssh/config`（Windows: `C:\Users\你的用户名\.ssh\config`）
 

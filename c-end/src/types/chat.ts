@@ -284,3 +284,48 @@ export interface RateLimitResult {
   resetAt: number // 重置时间戳
   retryAfter?: number // 需要等待的毫秒数
 }
+
+// ==================== 持久化类型 ====================
+
+/** 持久化会话元数据 */
+export interface PersistedConversationMeta {
+  id: string
+  title: string
+  lastMessageAt: number
+  messageCount: number
+  createdAt: number
+}
+
+/** 持久化消息数据 */
+export interface PersistedMessagesData {
+  conversationId: string
+  messages: ChatMessage[]
+  updatedAt: number
+}
+
+/** 持久化完整状态 */
+export interface PersistedChatState {
+  activeConversationId: string | null
+  conversations: PersistedConversationMeta[]
+  messagesByConversation: Record<string, ChatMessage[]>
+  savedAt: number
+  version: number
+}
+
+/** 持久化配置 */
+export interface PersistenceConfig {
+  storageKey: string
+  version: number
+  maxConversations: number
+  maxMessagesPerConversation: number
+  debounceMs: number
+}
+
+/** 持久化错误 */
+export type PersistenceErrorType = 'quota_exceeded' | 'parse_error' | 'version_mismatch' | 'unknown'
+
+export interface PersistenceError {
+  type: PersistenceErrorType
+  message: string
+  originalError?: unknown
+}

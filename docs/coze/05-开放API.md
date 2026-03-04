@@ -227,9 +227,95 @@ Content-Type: application/json
 | 4200 | 工作流未发布 |
 | 6003 | 高级功能，需要付费 |
 
+## 工作流 API 服务部署调用
+
+> 除通过 Coze API 调用外，还可以将工作流部署为 API 服务，通过自有域名直接调用。
+
+### 前提条件
+
+工作流需先完成 **API 服务部署**（在工作流编排页面操作）。
+
+### 支持的 API 接口
+
+| 接口 | 地址 | 方式 | 适用场景 | 超时规则 |
+|-----|------|------|---------|---------|
+| 执行工作流 | `/run` | 同步非流式 | 执行时间短、需一次性获取结果 | ≤5分钟，超时断连；长耗时需每300秒发心跳 |
+| 执行工作流（流式） | `/run/stream` | 流式 | 执行时间长、需获取中间结果 | ≤15分钟，服务端自动发送心跳 |
+| 查询工作流信息 | `/graph_parameter` | 同步查询 | 查询工作流状态与结果 | 无明确超时 |
+
+### 调用流程
+
+1. 在工作流部署页面，复制 Coze 提供的 **Curl 请求命令**
+2. 将请求头中的 `<YOUR_TOKEN>` 替换为自有 API Token
+3. 通过 Curl、Python、Node.js 发起请求
+
+### 请求示例
+
+**Curl**
+```bash
+curl --location 'https://t6h***.coze.site/run' \
+--header 'Authorization: Bearer 你的API_Token' \
+--header 'Content-Type: application/json' \
+--data '{"number1":0,"number2":0}'
+```
+
+**返回示例（/run）**
+```json
+{
+  "result": 0.0,
+  "run_id": "858996f9-ba21-45aa-ae5f-5c8771c9****"
+}
+```
+
+**返回示例（/run/stream 流式）**
+```
+id: 0
+event: message
+data: {"type": "node_start", "timestamp": 1768877934224, "run_id": "xxx", "node_name": "calculator", "input": {"a": 1.0, "b": 2.0}}
+
+id: 4
+event: message
+data: {"type": "done", "timestamp": 1768877936246, "run_id": "xxx", "output": {"result": 3.0}, "time_cost_ms": 2024}
+```
+
+**返回示例（/graph_parameter 查询）**
+```json
+{
+  "code": 0,
+  "msg": "",
+  "input_schema": {
+    "description": "工作流的输入",
+    "properties": {"number1": {"type": "number"}, "number2": {"type": "number"}},
+    "required": ["number1", "number2"]
+  },
+  "output_schema": {
+    "description": "工作流的输出",
+    "properties": {"result": {"type": "number"}},
+    "required": ["result"]
+  }
+}
+```
+
+### 流式事件类型
+
+| 事件类型 | 说明 |
+|---------|------|
+| `node_start` | 节点开始执行 |
+| `node_end` | 节点执行结束 |
+| `done` | 工作流执行完成 |
+
+### 故障排查
+
+1. 确认 `Authorization: Bearer <Token>` 中的 API Token 正确
+2. 确认请求体中的参数名、数据类型与工作流定义一致
+3. 查看返回的 `code` 和 `msg` 字段定位问题
+
+---
+
 ## 相关链接
 
 - API 概览: https://docs.coze.cn/api/open/docs/developer_guides/coze_api_overview
 - Chat API: https://docs.coze.cn/api/open/docs/developer_guides/chat_v3
 - 工作流 API: https://docs.coze.cn/api/open/docs/developer_guides/workflow_run
 - 文件上传: https://docs.coze.cn/api/open/docs/developer_guides/upload_files
+- 工作流 API 服务: https://www.coze.cn/open/docs/guides/workflow_api_service
