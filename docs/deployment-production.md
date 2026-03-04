@@ -327,14 +327,39 @@ curl http://localhost:8080
 
 ---
 
-## 九、待办事项
+## 九、运维功能
+
+### 9.1 数据自动清理
+
+**清理规则**： 每天凌晨 3:00 自动清理 15 天前的用户面试数据
+
+**清理范围**：
+| 表名 | 说明 |
+|-----|------|
+| Interview | 面试记录 |
+| CozeQuestionSession | 多轮问询会话 |
+| Conversation | C 端对话记录 |
+| EmotionRecord | 情绪记录 |
+
+**手动触发清理**：
+```bash
+curl -X POST -H "X-Cleanup-Key: wehan_cleanup_key_2026" http://localhost:3000/api/cleanup
+```
+
+**查看清理日志**：
+```bash
+cat /www/wwwroot/WeHan/web/logs/cleanup.log
+```
+
+---
+
+## 十、待办事项
 
 - [ ] 域名备案完成后配置 HTTPS
-- [ ] 迁移 `CozeQuestionSession` 表到生产环境
 - [ ] 配置自动备份
 - [ ] 配置日志轮转
 
 ---
 
-*文档版本: 1.1 | 更新时间: 2026-03-02 | 维护者: WeHan 开发团队*
-*变更: 新增连接指南章节、移除明文密码*
+*文档版本: 1.2 | 更新时间: 2026-03-04 | 维护者: WeHan 开发团队*
+*变更: 新增数据清理功能章节*
