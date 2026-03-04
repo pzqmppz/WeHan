@@ -81,17 +81,6 @@ export default function HomePage() {
           <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-400/20 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
-          {/* 武汉城市天际线 - 右下角装饰 */}
-          <div className="absolute bottom-0 right-0 w-1/2 h-full opacity-20 pointer-events-none">
-            <Image
-              src="/images/wuhan-skyline.png"
-              alt="武汉城市天际线"
-              fill
-              className="object-cover object-right-bottom"
-              priority
-            />
-          </div>
-
           <div className="relative max-w-6xl mx-auto px-8">
             <Row gutter={48} align="middle">
               <Col xs={24} md={14}>
