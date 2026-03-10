@@ -25,18 +25,18 @@ import { usePolicies } from '@/hooks/usePolicies'
 
 const { Title, Paragraph, Text } = Typography
 
-// 图标映射
-const ICON_MAP: Record<string, React.ReactNode> = {
-  RocketOutlined: <RocketOutlined className="text-4xl text-primary" />,
-  BankOutlined: <BankOutlined className="text-4xl text-primary" />,
-  HeartOutlined: <HeartOutlined className="text-4xl text-primary" />,
-  SafetyCertificateOutlined: <SafetyCertificateOutlined className="text-4xl text-primary" />,
-  TeamOutlined: <TeamOutlined className="text-4xl text-primary" />,
-  FileTextOutlined: <FileTextOutlined className="text-4xl text-primary" />,
-  TrophyOutlined: <TrophyOutlined className="text-4xl text-primary" />,
-  StarOutlined: <StarOutlined className="text-4xl text-primary" />,
-  BulbOutlined: <BulbOutlined className="text-4xl text-primary" />,
-  ThunderboltOutlined: <ThunderboltOutlined className="text-4xl text-primary" />,
+// 图标组件映射（不带样式）
+const ICON_COMPONENTS: Record<string, React.ElementType> = {
+  RocketOutlined,
+  BankOutlined,
+  HeartOutlined,
+  SafetyCertificateOutlined,
+  TeamOutlined,
+  FileTextOutlined,
+  TrophyOutlined,
+  StarOutlined,
+  BulbOutlined,
+  ThunderboltOutlined,
 }
 
 // 政策类型名称
@@ -64,11 +64,14 @@ export default function HomePage() {
   const features = config.features
     .filter(f => f.enabled)
     .sort((a, b) => a.order - b.order)
-    .map(feature => ({
-      icon: ICON_MAP[feature.icon] || <StarOutlined className="text-4xl text-primary" />,
-      title: feature.title,
-      description: feature.description,
-    }))
+    .map(feature => {
+      const IconComponent = ICON_COMPONENTS[feature.icon] || StarOutlined
+      return {
+        icon: IconComponent,
+        title: feature.title,
+        description: feature.description,
+      }
+    })
 
   return (
     <PublicPageLayout showFooter={true} icpNumber={config.footerLinks.icpNumber}>
@@ -111,14 +114,14 @@ export default function HomePage() {
 
             <Title
               level={1}
-              className="!text-white !mb-3 sm:!mb-4 !text-4xl sm:!text-6xl lg:!text-7xl font-bold tracking-tight"
+              className="!text-white !mb-4 sm:!mb-6 !text-4xl sm:!text-6xl lg:!text-7xl font-bold tracking-tight"
               style={{ textShadow: '0 4px 30px rgba(0,0,0,0.3)' }}
             >
               才聚江城
             </Title>
             <Title
               level={2}
-              className="!text-white/90 !font-normal !mt-0 !mb-6 sm:!mb-8 !text-lg sm:!text-2xl"
+              className="!text-white/80 !font-normal !mt-0 !mb-8 sm:!mb-10 !text-lg sm:!text-2xl font-medium"
               style={{ textShadow: '0 2px 15px rgba(0,0,0,0.2)' }}
             >
               武汉人才留汉智能服务平台
@@ -179,16 +182,16 @@ export default function HomePage() {
         </div>
 
         {/* 数据可信度区 - 独立区域 */}
-        <div className="py-12 bg-white border-b">
-          <div className="max-w-6xl mx-auto px-8">
-            <Row gutter={[32, 32]}>
+        <div className="py-16 sm:py-20 bg-white border-b">
+          <div className="max-w-6xl mx-auto px-4 sm:px-8">
+            <Row gutter={[24, 24]}>
               {stats.map((stat) => (
                 <Col xs={12} sm={6} key={stat.title}>
                   <div className="text-center">
-                    <div className="text-4xl font-bold text-blue-600 mb-1">
-                      {stat.value}<span className="text-xl text-gray-500 ml-1">{stat.suffix}</span>
+                    <div className="text-4xl sm:text-5xl font-bold text-blue-600 mb-2">
+                      {stat.value}<span className="text-xl sm:text-2xl text-gray-500 ml-1">{stat.suffix}</span>
                     </div>
-                    <div className="text-gray-600">{stat.title}</div>
+                    <div className="text-gray-600 text-sm sm:text-base">{stat.title}</div>
                   </div>
                 </Col>
               ))}
@@ -197,9 +200,9 @@ export default function HomePage() {
         </div>
 
         {/* Features Section */}
-        <div className="py-16 bg-gray-50">
-          <div className="max-w-6xl mx-auto px-8">
-            <Title level={2} className="text-center mb-12">
+        <div className="py-16 sm:py-20 bg-gray-50">
+          <div className="max-w-6xl mx-auto px-4 sm:px-8">
+            <Title level={2} className="text-center mb-10 sm:mb-14 !text-2xl sm:!text-3xl !font-semibold">
               为什么选择才聚江城
             </Title>
             {loading ? (
@@ -208,26 +211,33 @@ export default function HomePage() {
               </div>
             ) : (
               <Row gutter={[24, 24]}>
-                {features.map((feature) => (
-                  <Col xs={24} sm={12} lg={6} key={feature.title}>
-                    <Card className="h-full text-center hover:shadow-lg transition-shadow">
-                      <div className="mb-4">{feature.icon}</div>
-                      <Title level={4} className="!mb-2">{feature.title}</Title>
-                      <Text type="secondary">{feature.description}</Text>
-                    </Card>
-                  </Col>
-                ))}
+                {features.map((feature) => {
+                  const IconComponent = feature.icon
+                  return (
+                    <Col xs={24} sm={12} lg={6} key={feature.title}>
+                      <Card className="h-full text-center hover:shadow-lg transition-shadow border-0 shadow-sm">
+                        <div className="mb-4 flex justify-center">
+                          <span className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-50">
+                            <IconComponent className="text-3xl text-blue-600" />
+                          </span>
+                        </div>
+                        <Title level={4} className="!mb-2 !text-base sm:!text-lg">{feature.title}</Title>
+                        <Text type="secondary" className="text-sm sm:text-base leading-relaxed">{feature.description}</Text>
+                      </Card>
+                    </Col>
+                  )
+                })}
               </Row>
             )}
           </div>
         </div>
 
         {/* Policy Section */}
-        <div className="py-16">
-          <div className="max-w-6xl mx-auto px-8">
-            <Row gutter={48}>
+        <div className="py-16 sm:py-20">
+          <div className="max-w-6xl mx-auto px-4 sm:px-8">
+            <Row gutter={[32, 32]}>
               <Col xs={24} md={12}>
-                <Title level={3} className="mb-6">最新人才政策</Title>
+                <Title level={3} className="mb-6 !text-xl sm:!text-2xl !font-semibold">最新人才政策</Title>
                 {policiesLoading ? (
                   <div className="flex justify-center py-8">
                     <Spin />
@@ -258,15 +268,19 @@ export default function HomePage() {
                 </Link>
               </Col>
               <Col xs={24} md={12}>
-                <Title level={3} className="mb-6">加入我们</Title>
+                <Title level={3} className="mb-6 !text-xl sm:!text-2xl !font-semibold">加入我们</Title>
                 <Row gutter={[16, 16]}>
                   <Col span={12}>
                     <Card
                       className="text-center cursor-pointer hover:shadow-md transition-shadow h-full"
                       hoverable
                     >
-                      <BankOutlined className="text-3xl text-primary mb-2" />
-                      <Title level={5} className="!mb-1">企业入驻</Title>
+                      <div className="flex justify-center mb-3">
+                        <span className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-50">
+                          <BankOutlined className="text-2xl text-blue-600" />
+                        </span>
+                      </div>
+                      <Title level={5} className="!mb-1 !text-base sm:!text-lg">企业入驻</Title>
                       <Text type="secondary" className="text-sm">发布岗位，获取人才</Text>
                     </Card>
                   </Col>
@@ -275,8 +289,12 @@ export default function HomePage() {
                       className="text-center cursor-pointer hover:shadow-md transition-shadow h-full"
                       hoverable
                     >
-                      <SolutionOutlined className="text-3xl text-primary mb-2" />
-                      <Title level={5} className="!mb-1">学校合作</Title>
+                      <div className="flex justify-center mb-3">
+                        <span className="flex items-center justify-center w-12 h-12 rounded-full bg-green-50">
+                          <SolutionOutlined className="text-2xl text-green-600" />
+                        </span>
+                      </div>
+                      <Title level={5} className="!mb-1 !text-base sm:!text-lg">学校合作</Title>
                       <Text type="secondary" className="text-sm">提高就业率</Text>
                     </Card>
                   </Col>
@@ -285,8 +303,12 @@ export default function HomePage() {
                       className="text-center cursor-pointer hover:shadow-md transition-shadow h-full"
                       hoverable
                     >
-                      <TeamOutlined className="text-3xl text-primary mb-2" />
-                      <Title level={5} className="!mb-1">政府合作</Title>
+                      <div className="flex justify-center mb-3">
+                        <span className="flex items-center justify-center w-12 h-12 rounded-full bg-purple-50">
+                          <TeamOutlined className="text-2xl text-purple-600" />
+                        </span>
+                      </div>
+                      <Title level={5} className="!mb-1 !text-base sm:!text-lg">政府合作</Title>
                       <Text type="secondary" className="text-sm">人才留汉数据</Text>
                     </Card>
                   </Col>
@@ -295,8 +317,12 @@ export default function HomePage() {
                       className="text-center cursor-pointer hover:shadow-md transition-shadow h-full"
                       hoverable
                     >
-                      <RocketOutlined className="text-3xl text-primary mb-2" />
-                      <Title level={5} className="!mb-1">C端入口</Title>
+                      <div className="flex justify-center mb-3">
+                        <span className="flex items-center justify-center w-12 h-12 rounded-full bg-orange-50">
+                          <RocketOutlined className="text-2xl text-orange-600" />
+                        </span>
+                      </div>
+                      <Title level={5} className="!mb-1 !text-base sm:!text-lg">C端入口</Title>
                       <Text type="secondary" className="text-sm">WeHan 学生端</Text>
                     </Card>
                   </Col>
