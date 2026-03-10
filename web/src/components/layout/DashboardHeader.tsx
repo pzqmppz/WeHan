@@ -27,7 +27,7 @@ export function DashboardHeader({ role, collapsed, onToggle, userName }: Dashboa
 
   const handleMenuClick: MenuProps['onClick'] = async ({ key }) => {
     if (key === 'logout') {
-      if (window.confirm('确定要退出登录吗？')) {
+      if (window.confirm('退出登录后需要重新输入密码才能访问，确定要退出吗？')) {
         // 先清除 NextAuth session
         await signOut({ redirect: false })
         // 强制刷新页面，清除所有缓存

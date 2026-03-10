@@ -142,7 +142,6 @@ function LoginForm() {
         form={form}
         layout="vertical"
         onFinish={handleSubmit}
-        initialValues={{ email: 'admin@wehan.com', password: 'admin123' }}
       >
         <Form.Item
           name="email"
@@ -186,8 +185,8 @@ function LoginForm() {
         </Form.Item>
       </Form>
 
-      <div className="text-center text-gray-400 text-sm mt-4">
-        <Text type="secondary">
+      <div className="text-center text-sm mt-4">
+        <Text type="secondary" className="text-gray-500">
           测试账号: admin@wehan.com / admin123
         </Text>
       </div>

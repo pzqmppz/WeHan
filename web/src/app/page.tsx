@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Layout, Row, Col, Card, Statistic, Button, Typography, Space, Spin, Tag } from 'antd'
+import { Row, Col, Card, Statistic, Button, Typography, Space, Spin, Tag } from 'antd'
 import {
   TeamOutlined,
   BankOutlined,
@@ -17,12 +17,12 @@ import {
   FileTextOutlined,
   BulbOutlined,
   ThunderboltOutlined,
+  CheckCircleOutlined,
 } from '@ant-design/icons'
-import { PortalHeader, PortalFooter } from '@/components/layout'
+import { PublicPageLayout } from '@/components/layout'
 import { useHomepageConfig } from '@/hooks/useHomepageConfig'
 import { usePolicies } from '@/hooks/usePolicies'
 
-const { Content } = Layout
 const { Title, Paragraph, Text } = Typography
 
 // 图标映射
@@ -71,83 +71,127 @@ export default function HomePage() {
     }))
 
   return (
-    <Layout className="min-h-screen">
-      <PortalHeader />
+    <PublicPageLayout showFooter={true} icpNumber={config.footerLinks.icpNumber}>
+      {/* Hero Section - 设计增强版 */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 text-white py-28 min-h-[520px]">
+          {/* 装饰性网格背景 */}
+          <div
+            className="absolute inset-0 opacity-10"
+            style={{
+              backgroundImage: `
+                linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+              `,
+              backgroundSize: '60px 60px'
+            }}
+          />
 
-      {/* Hero Section */}
-      <Content className="!p-0">
-        <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 text-white py-20 min-h-[500px]">
-          {/* 装饰性光晕 */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-400/20 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+          {/* 装饰性光晕 - 多层叠加 */}
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-cyan-400/20 to-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-indigo-400/15 to-purple-500/10 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4 pointer-events-none" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-400/5 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="relative max-w-6xl mx-auto px-8">
-            <Row gutter={48} align="middle">
-              <Col xs={24} md={14}>
-                <Title
-                  level={1}
-                  className="!text-white !mb-4 !text-5xl"
-                  style={{ textShadow: '0 2px 20px rgba(0,0,0,0.2)' }}
-                >
-                  才聚江城
-                </Title>
-                <Title
-                  level={2}
-                  className="!text-white/90 !font-normal !mt-0 !mb-6"
-                  style={{ textShadow: '0 1px 10px rgba(0,0,0,0.15)' }}
-                >
-                  武汉人才留汉智能服务平台
-                </Title>
-                <Paragraph className="!text-white/80 text-lg mb-8 max-w-xl">
-                  连接武汉高校人才与本地企业，帮助武汉大学生留在武汉就业，
-                  帮助武汉企业找到本地人才。
-                </Paragraph>
-                <Space size="large">
-                  <Link href="/register">
-                    <Button
-                      type="primary"
-                      size="large"
-                      className="h-12 px-8 text-lg font-medium bg-white !text-blue-600 hover:bg-white/90 hover:scale-105 transition-all shadow-lg"
-                      icon={<ArrowRightOutlined />}
-                    >
-                      立即注册
-                    </Button>
-                  </Link>
-                  <Link href="/login">
-                    <Button
-                      ghost
-                      size="large"
-                      className="h-12 px-8 text-lg font-medium border-white/50 hover:bg-white/10"
-                    >
-                      企业登录
-                    </Button>
-                  </Link>
-                </Space>
-              </Col>
-              <Col xs={24} md={10} className="hidden md:block">
-                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 shadow-xl">
-                  <Title level={4} className="!text-white !mb-6 flex items-center gap-2">
-                    <ThunderboltOutlined className="text-yellow-300" />
-                    平台数据
-                  </Title>
-                  {loading ? (
-                    <div className="flex justify-center py-8">
-                      <Spin />
+          {/* 装饰性圆形 */}
+          <div className="absolute top-20 right-20 w-4 h-4 rounded-full bg-white/20" />
+          <div className="absolute top-40 right-40 w-2 h-2 rounded-full bg-white/30" />
+          <div className="absolute bottom-32 left-32 w-3 h-3 rounded-full bg-white/15" />
+          <div className="absolute top-1/3 left-16 w-2 h-2 rounded-full bg-cyan-300/30" />
+          <div className="absolute bottom-1/3 right-24 w-5 h-5 rounded-full bg-indigo-300/20" />
+
+          {/* 装饰性线条 */}
+          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+          <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+
+          <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            {/* 品牌标签 */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-6 sm:mb-8">
+              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+              <span className="text-xs sm:text-sm text-white/90">武汉人才服务平台</span>
+            </div>
+
+            <Title
+              level={1}
+              className="!text-white !mb-3 sm:!mb-4 !text-4xl sm:!text-6xl lg:!text-7xl font-bold tracking-tight"
+              style={{ textShadow: '0 4px 30px rgba(0,0,0,0.3)' }}
+            >
+              才聚江城
+            </Title>
+            <Title
+              level={2}
+              className="!text-white/90 !font-normal !mt-0 !mb-6 sm:!mb-8 !text-lg sm:!text-2xl"
+              style={{ textShadow: '0 2px 15px rgba(0,0,0,0.2)' }}
+            >
+              武汉人才留汉智能服务平台
+            </Title>
+            <Paragraph className="!text-white/80 text-base sm:!text-xl mb-8 sm:!mb-12 max-w-2xl mx-auto leading-relaxed">
+              连接武汉<span className="text-cyan-300 font-medium">高校人才</span>与本地企业
+              <br />
+              帮助大学生留在武汉就业，帮助企业找到本地优秀人才
+            </Paragraph>
+
+            {/* 单一主要 CTA - 增强效果 */}
+            <Link href="/register">
+              <Button
+                type="primary"
+                size="large"
+                className="h-12 sm:h-14 px-8 sm:px-12 text-base sm:text-lg font-semibold bg-white text-blue-600 hover:bg-white/95 hover:-translate-y-1 transition-all shadow-xl hover:shadow-2xl hover:shadow-blue-900/20"
+                icon={<ArrowRightOutlined />}
+              >
+                免费注册
+              </Button>
+            </Link>
+
+            {/* 次要入口 - 文字链接 */}
+            <div className="mt-6 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-white/90">
+              <Link
+                href="/login"
+                className="hover:text-white hover:underline transition-all duration-200 flex items-center gap-1 text-sm sm:text-base"
+                style={{ textDecorationColor: 'rgba(255,255,255,0.9)' }}
+              >
+                已有账号？登录
+              </Link>
+              <span className="text-white/30 hidden sm:inline">|</span>
+              <Link
+                href="/about"
+                className="hover:text-white hover:underline transition-all duration-200 flex items-center gap-1 text-sm sm:text-base"
+                style={{ textDecorationColor: 'rgba(255,255,255,0.9)' }}
+              >
+                了解更多平台优势
+              </Link>
+            </div>
+
+            {/* 底部信任标识 */}
+            <div className="mt-12 sm:mt-16 flex items-center justify-center gap-4 sm:gap-8 text-white/50 text-xs sm:text-sm">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <CheckCircleOutlined className="text-green-400 text-base sm:text-lg" />
+                <span>平台认证</span>
+              </div>
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <SafetyCertificateOutlined className="text-blue-300 text-base sm:text-lg" />
+                <span>数据安全</span>
+              </div>
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <TeamOutlined className="text-cyan-300 text-base sm:text-lg" />
+                <span>服务学生</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 数据可信度区 - 独立区域 */}
+        <div className="py-12 bg-white border-b">
+          <div className="max-w-6xl mx-auto px-8">
+            <Row gutter={[32, 32]}>
+              {stats.map((stat) => (
+                <Col xs={12} sm={6} key={stat.title}>
+                  <div className="text-center">
+                    <div className="text-4xl font-bold text-blue-600 mb-1">
+                      {stat.value}<span className="text-xl text-gray-500 ml-1">{stat.suffix}</span>
                     </div>
-                  ) : (
-                    <Row gutter={[16, 16]}>
-                      {stats.map((stat) => (
-                        <Col span={12} key={stat.title}>
-                          <div className="text-center p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
-                            <div className="text-3xl font-bold text-white">{stat.value}<span className="text-lg text-white/70">{stat.suffix}</span></div>
-                            <div className="text-white/70 text-sm mt-1">{stat.title}</div>
-                          </div>
-                        </Col>
-                      ))}
-                    </Row>
-                  )}
-                </div>
-              </Col>
+                    <div className="text-gray-600">{stat.title}</div>
+                  </div>
+                </Col>
+              ))}
             </Row>
           </div>
         </div>
@@ -214,7 +258,7 @@ export default function HomePage() {
                 </Link>
               </Col>
               <Col xs={24} md={12}>
-                <Title level={3} className="mb-6">合作入口</Title>
+                <Title level={3} className="mb-6">加入我们</Title>
                 <Row gutter={[16, 16]}>
                   <Col span={12}>
                     <Card
@@ -261,9 +305,6 @@ export default function HomePage() {
             </Row>
           </div>
         </div>
-      </Content>
-
-      <PortalFooter icpNumber={config.footerLinks.icpNumber} />
-    </Layout>
-  )
-}
+      </PublicPageLayout>
+    )
+  }

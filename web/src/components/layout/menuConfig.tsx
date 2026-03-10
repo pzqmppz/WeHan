@@ -42,7 +42,7 @@ const enterpriseMenuItems: MenuProps['items'] = [
   {
     key: '/enterprise/talent',
     icon: <TeamOutlined />,
-    label: <Link href="/enterprise/talent">人才库</Link>,
+    label: <Link href="/enterprise/talent">简历管理</Link>,
   },
   {
     key: '/enterprise/profile',
