@@ -123,7 +123,7 @@ export default function GovernmentStatisticsPage() {
               title="今日投递"
               value={stats?.todayApplications || 0}
               prefix={<RiseOutlined />}
-              valueStyle={{ color: '#1677FF' }}
+              valueStyle={{ color: 'var(--statistic-primary)' }}
             />
           </Card>
         </Col>
@@ -143,7 +143,7 @@ export default function GovernmentStatisticsPage() {
               value={stats?.retentionRate || 0}
               suffix="%"
               prefix={<CheckCircleOutlined />}
-              valueStyle={{ color: '#52C41A' }}
+              valueStyle={{ color: 'var(--statistic-success)' }}
             />
           </Card>
         </Col>

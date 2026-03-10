@@ -30,7 +30,7 @@ export function DashboardSider({ role, collapsed }: DashboardSiderProps) {
     >
       {/* Logo */}
       <div className="flex items-center justify-center h-16 border-b border-gray-100">
-        <Link href="/" className="text-xl font-bold text-primary-500">
+        <Link href="/" className="text-xl font-bold text-blue-600 hover:text-blue-700 transition-all duration-200">
           {collapsed ? '才' : '才聚江城'}
         </Link>
       </div>

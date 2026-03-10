@@ -41,7 +41,7 @@ export default function PublicHeader() {
             key={item.key}
             href={item.href}
             onClick={() => setMobileMenuOpen(false)}
-            className={`block px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`block px-4 py-3 min-h-[44px] rounded-lg text-sm font-medium transition-colors flex items-center ${
               activeKey === item.key
                 ? 'bg-blue-50 text-blue-600'
                 : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
@@ -55,7 +55,7 @@ export default function PublicHeader() {
             <Link
               href="/dashboard"
               onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50"
+              className="block px-4 py-3 min-h-[44px] rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50 flex items-center"
             >
               进入工作台
             </Link>
@@ -64,14 +64,14 @@ export default function PublicHeader() {
               <Link
                 href="/login"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
+                className="block px-4 py-3 min-h-[44px] rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 flex items-center"
               >
                 登录
               </Link>
               <Link
                 href="/register"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block px-3 py-2 mt-1 rounded-lg text-sm font-medium bg-blue-600 text-white text-center hover:bg-blue-700"
+                className="block px-4 py-3 min-h-[44px] mt-1 rounded-lg text-sm font-medium bg-blue-600 text-white text-center hover:bg-blue-700 flex items-center justify-center"
               >
                 注册
               </Link>
@@ -100,7 +100,7 @@ export default function PublicHeader() {
               <Link
                 key={item.key}
                 href={item.href}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                className={`px-4 py-3 min-h-[44px] rounded-lg text-sm font-medium transition-colors duration-200 flex items-center ${
                   activeKey === item.key
                     ? 'bg-blue-50 text-blue-600'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
@@ -117,7 +117,7 @@ export default function PublicHeader() {
             <div className="hidden md:flex items-center gap-2">
               {session ? (
                 <Link href="/dashboard">
-                  <Button type="primary" className="h-9 px-5 font-medium">
+                  <Button type="primary" className="h-11 px-5 font-medium min-h-[44px]">
                     进入工作台
                   </Button>
                 </Link>
@@ -127,7 +127,7 @@ export default function PublicHeader() {
                     <Button
                       type="text"
                       icon={<LoginOutlined />}
-                      className="text-gray-600 hover:text-blue-600 h-9"
+                      className="text-gray-600 hover:text-blue-600 h-11 min-h-[44px]"
                     >
                       登录
                     </Button>
@@ -136,7 +136,7 @@ export default function PublicHeader() {
                     <Button
                       type="primary"
                       icon={<UserAddOutlined />}
-                      className="h-9 px-4 font-medium"
+                      className="h-11 px-4 font-medium min-h-[44px]"
                     >
                       注册
                     </Button>
@@ -148,7 +148,7 @@ export default function PublicHeader() {
             {/* 移动端菜单按钮 */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-50"
+              className="md:hidden p-3 min-h-[44px] min-w-[44px] rounded-lg text-gray-500 hover:bg-gray-50 flex items-center justify-center"
               aria-label="Toggle menu"
             >
               <MenuOutlined className="text-xl" />

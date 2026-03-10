@@ -34,7 +34,11 @@
       "Bash(node --eval \":*)",
       "Bash(for:*)",
       "Bash(do echo:*)",
-      "Bash(done:*)"
+      "Bash(done:*)",
+      "Bash(ssh wehan \"cat /www/wwwroot/WeHan/web/.env 2>/dev/null || echo ''File not found''\")",
+      "Bash(ssh wehan \"echo ''=== Nginx Sites ==='' && ls -la /www/wwwroot/ && echo '''' && echo ''=== Disk Usage ==='' && df -h / && echo '''' && echo ''=== Memory ==='' && free -h\")",
+      "Bash(ssh wehan \"echo ''=== Database Tables ==='' && psql -U wehan -d wehan -c \"\"\\\\dt\"\" 2>/dev/null\")",
+      "mcp__web-reader__webReader"
     ]
   }
 }

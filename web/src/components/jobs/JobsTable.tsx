@@ -116,6 +116,7 @@ export function JobsTable({
               size="small"
               icon={<EyeOutlined />}
               onClick={() => router.push(`/enterprise/jobs/${record.id}`)}
+              aria-label={`查看岗位: ${record.title}`}
             />
           </Tooltip>
           <Tooltip title="编辑">
@@ -124,6 +125,7 @@ export function JobsTable({
               size="small"
               icon={<EditOutlined />}
               onClick={() => router.push(`/enterprise/jobs/${record.id}/edit`)}
+              aria-label={`编辑岗位: ${record.title}`}
             />
           </Tooltip>
           {record.status === 'DRAFT' && (
@@ -133,6 +135,7 @@ export function JobsTable({
                 size="small"
                 icon={<CheckCircleOutlined />}
                 onClick={() => onPublish(record.id)}
+                aria-label={`发布岗位: ${record.title}`}
               />
             </Tooltip>
           )}
@@ -143,6 +146,7 @@ export function JobsTable({
                 size="small"
                 icon={<StopOutlined />}
                 onClick={() => onClose(record.id)}
+                aria-label={`下架岗位: ${record.title}`}
               />
             </Tooltip>
           )}
@@ -153,6 +157,7 @@ export function JobsTable({
                 size="small"
                 icon={<CheckCircleOutlined />}
                 onClick={() => onPublish(record.id)}
+                aria-label={`重新发布岗位: ${record.title}`}
               />
             </Tooltip>
           )}
@@ -168,6 +173,7 @@ export function JobsTable({
                 size="small"
                 danger
                 icon={<DeleteOutlined />}
+                aria-label={`删除岗位: ${record.title}`}
               />
             </Tooltip>
           </Popconfirm>

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
-import { Card, Row, Col, Statistic, Typography, Progress, List, Button, Tag, Space, Spin } from 'antd'
+import { Card, Row, Col, Typography, Progress, List, Button, Tag, Space } from 'antd'
 import {
   TeamOutlined,
   FileTextOutlined,
@@ -9,11 +9,13 @@ import {
   NotificationOutlined,
   UserOutlined,
   SendOutlined,
+  HeartOutlined,
+  FundOutlined,
 } from '@ant-design/icons'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { EmploymentChart } from '@/components/charts'
+import { PageHeader, LoadingState } from '@/components/ui'
 
 const { Title, Text } = Typography
 
@@ -52,9 +54,7 @@ export default function SchoolDashboard() {
   if (status === 'loading') {
     return (
       <DashboardLayout role="school">
-        <div className="flex items-center justify-center h-64">
-          <Spin size="large" />
-        </div>
+        <LoadingState message="加载就业数据中..." />
       </DashboardLayout>
     )
   }
@@ -74,70 +74,102 @@ export default function SchoolDashboard() {
 
   return (
     <DashboardLayout role="school">
-      <div className="mb-6">
-        <Title level={4} className="!mb-2">就业数据看板</Title>
-        <Text type="secondary">学校就业数据概览</Text>
-      </div>
+      <PageHeader
+        title="就业数据看板"
+        subtitle="帮助每一位学生找到理想的职业方向"
+      />
 
-      {/* 统计卡片 */}
+      {/* 学校端 - 柔和温暖的统计卡片，带入场动画 */}
       <Row gutter={[16, 16]} className="mb-6">
+        {/* 毕业生总数 */}
         <Col xs={12} sm={6}>
-          <Card>
-            <Statistic
-              title="毕业生总数"
-              value={2400}
-              prefix={<TeamOutlined />}
-              valueStyle={{ color: '#1890ff' }}
-            />
+          <Card className="rounded-2xl border-0 shadow-sm bg-gradient-to-br from-blue-50 to-white card-hover animate-fade-in animate-delay-100">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                <TeamOutlined className="text-blue-500 text-sm" />
+              </div>
+              <Text type="secondary" className="text-xs">在校学生</Text>
+            </div>
+            <div className="text-3xl font-semibold text-gray-800 stat-number">{2400}</div>
+            <Text type="secondary" className="text-xs">名毕业生</Text>
           </Card>
         </Col>
+
+        {/* 已就业 - 温暖绿色 */}
         <Col xs={12} sm={6}>
-          <Card>
-            <Statistic
-              title="已就业"
-              value={1980}
-              prefix={<FileTextOutlined />}
-              valueStyle={{ color: '#52c41a' }}
-            />
+          <Card className="rounded-2xl border-0 shadow-sm bg-gradient-to-br from-green-50 to-white card-hover animate-fade-in animate-delay-200">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                <FileTextOutlined className="text-green-500 text-sm" />
+              </div>
+              <Text type="secondary" className="text-xs">已就业</Text>
+            </div>
+            <div className="text-3xl font-semibold text-green-600 stat-number">{1980}</div>
+            <Text type="secondary" className="text-xs">名学生</Text>
           </Card>
         </Col>
+
+        {/* 就业率 - 圆形进度 */}
         <Col xs={12} sm={6}>
-          <Card>
-            <Statistic
-              title="就业率"
-              value={82.5}
-              precision={1}
-              suffix="%"
-              prefix={<RiseOutlined style={{ color: '#52c41a' }} />}
-              valueStyle={{ color: '#52c41a' }}
-            />
+          <Card className="rounded-2xl border-0 shadow-sm bg-gradient-to-br from-teal-50 to-white card-hover animate-fade-in animate-delay-300">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <RiseOutlined className="text-teal-500" />
+                  <Text type="secondary" className="text-xs">就业率</Text>
+                </div>
+                <div className="text-3xl font-semibold text-teal-600 stat-number">82.5<span className="text-lg">%</span></div>
+              </div>
+              <Progress
+                type="circle"
+                percent={82.5}
+                size={56}
+                strokeColor="#14B8A6"
+                format={(percent) => <span className="text-xs text-teal-600">{percent}</span>}
+              />
+            </div>
           </Card>
         </Col>
+
+        {/* 留汉率 - 暖橙色 */}
         <Col xs={12} sm={6}>
-          <Card>
-            <Statistic
-              title="留汉率"
-              value={68}
-              suffix="%"
-              valueStyle={{ color: '#722ed1' }}
-            />
+          <Card className="rounded-2xl border-0 shadow-sm bg-gradient-to-br from-orange-50 to-white card-hover animate-fade-in animate-delay-400">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
+                <HeartOutlined className="text-orange-500 text-sm" />
+              </div>
+              <Text type="secondary" className="text-xs">留汉率</Text>
+            </div>
+            <div className="text-3xl font-semibold text-orange-500 stat-number">68<span className="text-lg">%</span></div>
+            <Text type="secondary" className="text-xs">选择留汉</Text>
           </Card>
         </Col>
       </Row>
 
       <Row gutter={[16, 16]}>
-        {/* 行业去向 */}
+        {/* 学生去向 - 柔和展示 */}
         <Col xs={24} lg={14}>
-          <Card title="学生去向行业分布">
+          <Card
+            title={<span className="flex items-center gap-2"><FundOutlined className="text-blue-400" /> 学生去向行业分布</span>}
+            className="rounded-2xl"
+          >
             <List
               dataSource={majorData}
               renderItem={(item: any) => (
-                <List.Item>
+                <List.Item className="!px-2">
                   <div className="w-full">
-                    <div className="flex justify-between mb-1">
-                      <Text>{item.industry}</Text>
-                      <Text strong>{item.count} 人</Text>
+                    <div className="flex justify-between mb-2 items-center">
+                      <Text className="text-sm">{item.industry}</Text>
+                      <Space>
+                        <Tag color="blue" className="mb-0 rounded-full px-3">{item.count} 人</Tag>
+                      </Space>
                     </div>
+                    <Progress
+                      percent={Math.round(item.count / 180 * 100)}
+                      showInfo={false}
+                      strokeColor="#1677FF"
+                      className="!h-2"
+                    />
                   </div>
                 </List.Item>
               )}
@@ -145,36 +177,43 @@ export default function SchoolDashboard() {
           </Card>
         </Col>
 
-        {/* 最近推送 */}
+        {/* 最近推送 - 温暖提示 */}
         <Col xs={24} lg={10}>
           <Card
-            title="最近岗位推送"
+            title={<span className="flex items-center gap-2"><NotificationOutlined className="text-orange-400" /> 最近岗位推送</span>}
             extra={
               <Button
                 type="primary"
                 size="small"
-                icon={<NotificationOutlined />}
+                icon={<SendOutlined />}
                 onClick={() => router.push('/school/push')}
+                className="rounded-full"
               >
                 推送岗位
               </Button>
             }
+            className="rounded-2xl"
           >
             <List
               dataSource={recentPushes}
               renderItem={(item) => (
-                <List.Item>
+                <List.Item className="!px-2">
                   <List.Item.Meta
+                    avatar={
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-100 to-yellow-100 flex items-center justify-center">
+                        <SendOutlined className="text-orange-500 text-sm" />
+                      </div>
+                    }
                     title={
                       <Space>
-                        <Text strong>{item.job}</Text>
-                        <Tag color="blue">{item.company}</Tag>
+                        <Text strong className="text-sm">{item.job}</Text>
+                        <Tag color="orange" className="mb-0 rounded-full px-2 text-xs">{item.company}</Tag>
                       </Space>
                     }
                     description={
-                      <Space split={<Text type="secondary">|</Text>}>
-                        <Text type="secondary">{item.target}</Text>
-                        <Text type="secondary">推送 {item.count} 人</Text>
+                      <Space split={<span className="text-gray-200">|</span>}>
+                        <Text type="secondary" className="text-xs">{item.target}</Text>
+                        <Text type="secondary" className="text-xs">推送 {item.count} 人</Text>
                       </Space>
                     }
                   />
@@ -185,27 +224,40 @@ export default function SchoolDashboard() {
         </Col>
       </Row>
 
-      {/* 快捷入口 */}
-      <Card className="mt-4" title="快捷入口">
+      {/* 快捷入口 - 更友好的卡片 */}
+      <Card className="mt-4 rounded-2xl" title={<span className="flex items-center gap-2"><UserOutlined className="text-purple-400" /> 快捷入口</span>}>
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={8}>
             <Card
               hoverable
-              className="text-center"
+              className="text-center rounded-xl border-2 hover:border-blue-300 transition-colors h-full bg-gradient-to-br from-blue-50 to-white"
               onClick={() => router.push('/school/students')}
             >
-              <UserOutlined style={{ fontSize: 32, color: '#1677FF' }} />
-              <div className="mt-2">学生管理</div>
+              <UserOutlined className="text-4xl text-blue-400 mb-3" />
+              <div className="font-medium text-gray-700">学生管理</div>
+              <Text type="secondary" className="text-xs">查看学生就业状态</Text>
             </Card>
           </Col>
           <Col xs={24} sm={8}>
             <Card
               hoverable
-              className="text-center"
+              className="text-center rounded-xl border-2 hover:border-green-300 transition-colors h-full bg-gradient-to-br from-green-50 to-white"
               onClick={() => router.push('/school/push')}
             >
-              <SendOutlined style={{ fontSize: 32, color: '#52C41A' }} />
-              <div className="mt-2">岗位推送</div>
+              <SendOutlined className="text-4xl text-green-400 mb-3" />
+              <div className="font-medium text-gray-700">岗位推送</div>
+              <Text type="secondary" className="text-xs">精准推送岗位机会</Text>
+            </Card>
+          </Col>
+          <Col xs={24} sm={8}>
+            <Card
+              hoverable
+              className="text-center rounded-xl border-2 hover:border-purple-300 transition-colors h-full bg-gradient-to-br from-purple-50 to-white"
+              onClick={() => router.push('/school/analytics')}
+            >
+              <FundOutlined className="text-4xl text-purple-400 mb-3" />
+              <div className="font-medium text-gray-700">数据分析</div>
+              <Text type="secondary" className="text-xs">就业数据可视化</Text>
             </Card>
           </Col>
         </Row>

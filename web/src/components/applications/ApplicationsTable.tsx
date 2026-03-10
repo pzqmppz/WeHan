@@ -44,7 +44,7 @@ export default function ApplicationsTable({
       width: 200,
       render: (_, record) => (
         <div className="flex items-center gap-3">
-          <Avatar icon={<UserOutlined />} className="bg-blue-500" />
+          <Avatar icon={<UserOutlined />} className="bg-blue-500" alt={`${record.user.name} 的头像`} />
           <div>
             <Text strong>{record.user.name}</Text>
             <br />
@@ -124,6 +124,7 @@ export default function ApplicationsTable({
                 size="small"
                 icon={<EyeOutlined />}
                 onClick={() => router.push(`/enterprise/applications/${record.id}`)}
+                aria-label={`查看 ${record.user.name} 的投递详情`}
               />
             </Tooltip>
 
@@ -135,6 +136,7 @@ export default function ApplicationsTable({
                     size="small"
                     icon={<CheckCircleOutlined />}
                     onClick={() => onUpdateStatus(record.id, 'VIEWED')}
+                    aria-label={`标记 ${record.user.name} 的投递为已查看`}
                   />
                 </Tooltip>
                 <Tooltip title="拒绝">
@@ -144,6 +146,7 @@ export default function ApplicationsTable({
                     danger
                     icon={<CloseCircleOutlined />}
                     onClick={() => onUpdateStatus(record.id, 'REJECTED')}
+                    aria-label={`拒绝 ${record.user.name} 的投递`}
                   />
                 </Tooltip>
               </>
@@ -157,6 +160,7 @@ export default function ApplicationsTable({
                     size="small"
                     icon={<CalendarOutlined />}
                     onClick={() => onUpdateStatus(record.id, 'INTERVIEWING')}
+                    aria-label={`安排 ${record.user.name} 的面试`}
                   />
                 </Tooltip>
                 <Tooltip title="拒绝">
@@ -166,6 +170,7 @@ export default function ApplicationsTable({
                     danger
                     icon={<CloseCircleOutlined />}
                     onClick={() => onUpdateStatus(record.id, 'REJECTED')}
+                    aria-label={`拒绝 ${record.user.name} 的投递`}
                   />
                 </Tooltip>
               </>
@@ -177,9 +182,10 @@ export default function ApplicationsTable({
                   <Button
                     type="text"
                     size="small"
-                    style={{ color: '#52c41a' }}
+                    style={{ color: 'var(--statistic-success)' }}
                     icon={<CheckCircleOutlined />}
                     onClick={() => onUpdateStatus(record.id, 'OFFERED')}
+                    aria-label={`录用 ${record.user.name}`}
                   />
                 </Tooltip>
                 <Tooltip title="拒绝">
@@ -189,6 +195,7 @@ export default function ApplicationsTable({
                     danger
                     icon={<CloseCircleOutlined />}
                     onClick={() => onUpdateStatus(record.id, 'REJECTED')}
+                    aria-label={`拒绝 ${record.user.name} 的投递`}
                   />
                 </Tooltip>
               </>

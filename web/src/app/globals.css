@@ -1,10 +1,38 @@
 @import "tailwindcss";
 
 :root {
+  /* 基础颜色 */
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #262626; /* 使用设计系统 text-primary */
   --primary: #1890ff;
   --primary-hover: #40a9ff;
+
+  /* 设计系统颜色 (从 docs/design-system.md) */
+  --primary-500: #1677FF;
+  --primary-600: #0958D9;
+
+  --success-main: #52C41A;
+  --warning-main: #FAAD14;
+  --error-main: #FF4D4F;
+  --info-main: #1677FF;
+
+  --purple-main: #722ED1;
+
+  /* 统计卡片语义颜色 */
+  --statistic-primary: var(--primary-500);
+  --statistic-success: var(--success-main);
+  --statistic-warning: var(--warning-main);
+  --statistic-purple: var(--purple-main);
+  --statistic-info: var(--info-main);
+
+  /* 文字颜色 */
+  --text-primary: #262626;
+  --text-secondary: #595959;
+  --text-disabled: #BFBFBF;
+
+  /* 背景色 */
+  --bg-page: #F0F2F5;
+  --bg-card: #FFFFFF;
 }
 
 @theme inline {
@@ -16,7 +44,9 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  /* 中文字体优先 - 品牌识别度 */
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+               -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 /* Ant Design 覆盖样式 */
@@ -58,6 +88,54 @@ body {
   color: #fff;
 }
 
+/* ============================================
+   Accessibility - Focus Indicators (焦点指示器)
+   ============================================ */
+/* 确保所有可聚焦元素有可见焦点 */
+*:focus-visible {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* 链接焦点样式 */
+a:focus-visible {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* 按钮焦点样式 - Ant Design 兼容 */
+button:focus-visible,
+.ant-btn:focus-visible {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 2px;
+}
+
+/* 输入框焦点样式 - 确保与 Ant Design 兼容 */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+.ant-input:focus-visible,
+.ant-select:focus-visible {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 1px;
+}
+
+/* ============================================
+   Accessibility - Reduced Motion (减少动效)
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* 链接样式 */
 a {
   color: var(--primary);
@@ -76,4 +154,285 @@ a:hover {
 /* 背景色 */
 .bg-primary {
   background-color: var(--primary) !important;
+}
+
+/* ============================================
+   Animation System (动效系统)
+   适中平衡风格 - 专业、高效、愉悦
+   ============================================ */
+
+/* 缓动曲线 - 自然减速 */
+:root {
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* 动效时长 */
+  --duration-instant: 100ms;    /* 即时反馈 */
+  --duration-fast: 150ms;       /* 快速过渡 */
+  --duration-normal: 200ms;     /* 常规过渡 */
+  --duration-slow: 300ms;       /* 慢速过渡 */
+}
+
+/* ============================================
+   Entrance Animations (入场动画)
+   ============================================ */
+
+/* 页面内容错峰淡入 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 卡片入场动画 - 错峰淡入 */
+.animate-fade-in {
+  animation: fadeInUp var(--duration-normal) var(--ease-out-quart) both;
+}
+
+/* 错峰延迟 - 用于多个卡片 */
+.animate-delay-100 { animation-delay: 50ms; }
+.animate-delay-200 { animation-delay: 100ms; }
+.animate-delay-300 { animation-delay: 150ms; }
+.animate-delay-400 { animation-delay: 200ms; }
+
+/* ============================================
+   Micro-interactions (微交互)
+   ============================================ */
+
+/* 卡片 hover 效果 - 轻微上浮 */
+.card-hover {
+  transition: transform var(--duration-fast) var(--ease-out-quart),
+              box-shadow var(--duration-normal) var(--ease-out-quart);
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 按钮点击反馈 */
+.button-press {
+  transition: transform var(--duration-instant) var(--ease-out-quart);
+}
+
+.button-press:active {
+  transform: scale(0.97);
+}
+
+/* 统计数字增长动画 */
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.stat-number {
+  animation: countUp var(--duration-slow) var(--ease-out-quint);
+}
+
+/* ============================================
+   State Transitions (状态过渡)
+   ============================================ */
+
+/* 加载中脉冲效果 */
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.pulse-subtle {
+  animation: pulse-subtle 2s var(--ease-in-out) infinite;
+}
+
+/* 骨架屏扫描效果 */
+@keyframes skeleton-scan {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-animate {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #e0e0e0 50%,
+    #f0f0f0 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-scan 1.5s var(--ease-in-out) infinite;
+}
+
+/* 列表项展开动画 */
+.list-item-expand {
+  transition:
+    max-height var(--duration-slow) var(--ease-out-quart),
+    opacity var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-fast) var(--ease-out-quart);
+  overflow: hidden;
+}
+
+/* ============================================
+   Feedback Animations (反馈动画)
+   ============================================ */
+
+/* 成功状态打勾动画 */
+@keyframes check-success {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.check-animate {
+  animation: check-success var(--duration-normal) var(--ease-out-quint);
+}
+
+/* 错误摇晃动画 */
+@keyframes shake-error {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+.shake-error {
+  animation: shake-error var(--duration-fast) var(--ease-in-out);
+}
+
+/* 进度条填充动画 */
+@keyframes progress-fill {
+  from {
+    width: 0%;
+  }
+}
+
+.progress-animate {
+  animation: progress-fill var(--duration-slow) var(--ease-out-quart);
+}
+
+/* ============================================
+   Interactive Elements (交互元素)
+   ============================================ */
+
+/* 可点击元素 - 指针变化 */
+.interactive {
+  cursor: pointer;
+  transition:
+    color var(--duration-fast) var(--ease-out-quart),
+    background-color var(--duration-fast) var(--ease-out-quart);
+}
+
+/* 徽章计数动画 */
+@keyframes badge-pop {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.badge-animate {
+  animation: badge-pop var(--duration-normal) var(--ease-out-quint);
+}
+
+/* ============================================
+   Loading States (加载状态)
+   ============================================ */
+
+/* 内容渐显 - 从加载到内容 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn var(--duration-normal) var(--ease-out-quart);
+}
+
+/* 内容滑入 */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.slide-in-right {
+  animation: slideInRight var(--duration-normal) var(--ease-out-quart);
+}
+
+/* ============================================
+   Hover Effects (悬停效果)
+   ============================================ */
+
+/* 图标轻微旋转 */
+.icon-rotate-hover {
+  transition: transform var(--duration-normal) var(--ease-out-quart);
+}
+
+.icon-rotate-hover:hover {
+  transform: rotate(90deg);
+}
+
+/* 链接下划线展开 */
+.link-underline {
+  position: relative;
+}
+
+.link-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background-color: currentColor;
+  transition: width var(--duration-normal) var(--ease-out-quart);
+}
+
+.link-underline:hover::after {
+  width: 100%;
 }

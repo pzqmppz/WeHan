@@ -97,7 +97,7 @@ export default function ApplicationsPage() {
               title="今日投递"
               value={statistics.today}
               prefix={<TeamOutlined />}
-              valueStyle={{ color: '#1677FF' }}
+              valueStyle={{ color: 'var(--statistic-primary)' }}
             />
           </Card>
         </Col>
@@ -107,7 +107,7 @@ export default function ApplicationsPage() {
               title="待处理"
               value={statistics.pending}
               prefix={<UserOutlined />}
-              valueStyle={{ color: '#FAAD14' }}
+              valueStyle={{ color: 'var(--statistic-warning)' }}
             />
           </Card>
         </Col>

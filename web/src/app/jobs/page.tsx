@@ -12,12 +12,15 @@ import {
   EnvironmentOutlined,
   BankOutlined,
   ArrowRightOutlined,
+  TeamOutlined,
+  BulbOutlined,
+  ThunderboltOutlined,
 } from '@ant-design/icons'
 import Link from 'next/link'
 import type { Job } from '@prisma/client'
 import { PublicPageLayout } from '@/components/layout'
 
-const { Title, Text } = Typography
+const { Title, Paragraph, Text } = Typography
 const { Search } = Input
 
 interface JobWithEnterprise extends Job {
@@ -126,6 +129,52 @@ export default function JobsPage() {
 
   return (
     <PublicPageLayout bgClassName="bg-gray-50">
+      {/* Hero Section - 与其他页面统一的蓝色渐变 */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 text-white py-16 sm:py-20">
+        {/* 装饰性网格背景 - 与首页一致 */}
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '60px 60px'
+          }}
+        />
+
+        {/* 装饰性光晕 */}
+        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-gradient-to-br from-cyan-400/20 to-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-gradient-to-tr from-indigo-400/15 to-purple-500/10 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4 pointer-events-none" />
+
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="max-w-3xl">
+            <Title level={1} className="!text-white !mb-4 !text-3xl sm:!text-4xl lg:!text-5xl !font-semibold !leading-tight">
+              求职招聘
+            </Title>
+            <Paragraph className="!text-white/90 !text-base sm:!text-xl !mb-6 sm:!mb-8 !leading-relaxed">
+              探索武汉本地优质工作机会，连接高校人才与企业需求
+            </Paragraph>
+
+            {/* 关键数据 */}
+            <div className="flex gap-6 sm:gap-12">
+              <div>
+                <div className="text-3xl sm:text-4xl font-bold text-white mb-1">{pagination.total}+</div>
+                <Text className="text-white/70 text-xs sm:text-sm">在线岗位</Text>
+              </div>
+              <div>
+                <div className="text-3xl sm:text-4xl font-bold text-white mb-1">500+</div>
+                <Text className="text-white/70 text-xs sm:text-sm">入驻企业</Text>
+              </div>
+              <div>
+                <div className="text-3xl sm:text-4xl font-bold text-white mb-1">每日</div>
+                <Text className="text-white/70 text-xs sm:text-sm">岗位更新</Text>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* 页面头部 */}
       <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
@@ -143,7 +192,7 @@ export default function JobsPage() {
         <div className="bg-white rounded-lg p-3 sm:p-4 mb-3 sm:mb-4 shadow-sm">
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <Search
-              placeholder="搜索岗位名称"
+              placeholder="输入岗位名称，如：前端工程师"
               onSearch={handleSearch}
               enterButton={<SearchOutlined />}
               allowClear
@@ -151,7 +200,7 @@ export default function JobsPage() {
               size="large"
             />
             <Select
-              placeholder="行业"
+              placeholder="选择行业"
               allowClear
               className="w-full sm:w-32"
               onChange={(value) => {
@@ -168,7 +217,7 @@ export default function JobsPage() {
               size="large"
             />
             <Select
-              placeholder="区域"
+              placeholder="选择区域"
               allowClear
               className="w-full sm:w-32"
               onChange={(value) => {
@@ -194,7 +243,12 @@ export default function JobsPage() {
           </div>
         ) : jobs.length === 0 ? (
           <Empty
-            description="暂无岗位"
+            description={
+              <div className="text-center">
+                <div className="mb-2">没有找到符合条件的岗位</div>
+                <div className="text-sm text-gray-400">试试调整搜索条件或选择其他筛选条件</div>
+              </div>
+            }
             image={Empty.PRESENTED_IMAGE_SIMPLE}
           />
         ) : (

@@ -27,10 +27,10 @@ export default function PublicPageLayout({
 }: PublicPageLayoutProps) {
   return (
     <div className={`min-h-screen flex flex-col ${bgClassName}`}>
-      {/* 统一顶部导航 */}
+      {/* 统一顶部导航 - sticky 定位 */}
       <PublicHeader />
 
-      {/* 主内容区 */}
+      {/* 主内容区 - 无需额外 padding，sticky header 会自动占据空间 */}
       <main className="flex-1">
         {children}
       </main>

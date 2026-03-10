@@ -20,11 +20,6 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body className="antialiased">
-        {/* Skip link for keyboard navigation - WCAG 2.1 AA 2.4.1 */}
-        <a href="#main-content" className="skip-link">
-          跳转到主内容
-        </a>
-
         <SessionProvider>
           <AntdRegistry>
             <ConfigProvider
@@ -39,7 +34,7 @@ export default function RootLayout({
             }}
             >
               <AntApp>
-                <main id="main-content" tabIndex={-1}>
+                <main>
                   {children}
                 </main>
               </AntApp>

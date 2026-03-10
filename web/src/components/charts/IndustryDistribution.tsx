@@ -6,9 +6,18 @@ import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend
 } from 'recharts'
 
+// 使用设计系统颜色
 const COLORS = [
-  '#1677FF', '#52C41A', '#FAAD14', '#FF4D4F', '#722ED1',
-  '#13C2C2', '#EB2F96', '#FA8C16', '#A0D911', '#2F54EB'
+  'var(--statistic-primary)',
+  'var(--statistic-success)',
+  'var(--statistic-warning)',
+  'var(--statistic-error)',
+  'var(--statistic-purple)',
+  '#13C2C2',
+  '#EB2F96',
+  '#FA8C16',
+  '#A0D911',
+  '#2F54EB'
 ]
 
 interface IndustryData {
@@ -64,8 +73,8 @@ export default function IndustryDistributionChart({
             fill="#8884d8"
             dataKey="value"
           >
-            {chartData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            {chartData.map((entry) => (
+              <Cell key={`cell-${entry.name}`} fill={COLORS[chartData.indexOf(entry) % COLORS.length]} />
             ))}
           </Pie>
           <Tooltip />

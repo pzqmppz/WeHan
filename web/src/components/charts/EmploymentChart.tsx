@@ -71,7 +71,7 @@ export default function EmploymentChart({
             title="就业率"
             value={data.employmentRate}
             suffix="%"
-            valueStyle={{ color: data.employmentRate >= 50 ? '#52C41A' : '#FAAD14' }}
+            valueStyle={{ color: data.employmentRate >= 50 ? 'var(--statistic-success)' : 'var(--statistic-warning)' }}
           />
         </Col>
       </Row>
@@ -80,9 +80,9 @@ export default function EmploymentChart({
         <div className="mt-4">
           <div className="text-sm text-gray-500 mb-2">热门行业</div>
           <div className="flex flex-wrap gap-2">
-            {data.topIndustries.slice(0, 5).map((item, index) => (
+            {data.topIndustries.slice(0, 5).map((item) => (
               <span
-                key={index}
+                key={`industry-${item.industry}`}
                 className="px-2 py-1 bg-blue-50 text-blue-600 rounded text-sm"
               >
                 {item.industry} ({item.count})
@@ -96,9 +96,9 @@ export default function EmploymentChart({
         <div className="mt-4">
           <div className="text-sm text-gray-500 mb-2">热门企业</div>
           <div className="flex flex-wrap gap-2">
-            {data.topCompanies.slice(0, 5).map((item, index) => (
+            {data.topCompanies.slice(0, 5).map((item) => (
               <span
-                key={index}
+                key={`company-${item.name}`}
                 className="px-2 py-1 bg-green-50 text-green-600 rounded text-sm"
               >
                 {item.name} ({item.count})

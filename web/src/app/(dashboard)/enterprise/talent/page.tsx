@@ -72,7 +72,7 @@ export default function TalentPoolPage() {
               title="人才总数"
               value={statistics?.totalTalents || 0}
               prefix={<TeamOutlined />}
-              valueStyle={{ color: '#1890ff' }}
+              valueStyle={{ color: 'var(--statistic-primary)' }}
             />
           </Card>
         </Col>
@@ -82,7 +82,7 @@ export default function TalentPoolPage() {
               title="本周新增"
               value={statistics?.newThisWeek || 0}
               prefix={<RiseOutlined />}
-              valueStyle={{ color: '#52c41a' }}
+              valueStyle={{ color: 'var(--statistic-success)' }}
             />
           </Card>
         </Col>
@@ -92,7 +92,7 @@ export default function TalentPoolPage() {
               title="面试中"
               value={statistics?.interviewed || 0}
               prefix={<UserOutlined />}
-              valueStyle={{ color: '#faad14' }}
+              valueStyle={{ color: 'var(--statistic-warning)' }}
             />
           </Card>
         </Col>
@@ -102,7 +102,7 @@ export default function TalentPoolPage() {
               title="已录用"
               value={statistics?.offered || 0}
               prefix={<TrophyOutlined />}
-              valueStyle={{ color: '#52c41a' }}
+              valueStyle={{ color: 'var(--statistic-success)' }}
             />
           </Card>
         </Col>
