@@ -30,8 +30,8 @@ export function InterviewProgress({
         <Progress
           percent={percent}
           strokeColor={{
-            '0%': '#1677FF',
-            '100%': '#52C41A',
+            '0%': 'var(--primary)',
+            '100%': 'var(--cta)',
           }}
           trailColor="#E5E7EB"
           showInfo={false}
@@ -41,7 +41,7 @@ export function InterviewProgress({
 
       {/* 进度文字和标签 */}
       <div className="flex items-center justify-between">
-        <span className="text-sm text-gray-600">
+        <span className="text-sm text-[var(--text-secondary)]">
           第 {current} / {total} 题
         </span>
 

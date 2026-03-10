@@ -79,13 +79,15 @@ export class ChatErrorBoundary extends Component<
               <div className="flex gap-3">
                 <button
                   onClick={this.handleRetry}
-                  className="px-4 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                  className="px-4 py-2 text-sm rounded hover:bg-[var(--background)] transition-colors"
+                  style={{ background: 'var(--primary)', color: 'white' }}
                 >
                   重新加载
                 </button>
                 <button
                   onClick={this.handleReset}
-                  className="px-4 py-2 text-sm border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 text-sm border rounded hover:bg-[var(--background)] transition-colors"
+                  style={{ borderColor: 'var(--border)' }}
                 >
                   重试
                 </button>

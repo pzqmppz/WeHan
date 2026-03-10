@@ -114,7 +114,8 @@ export function ConversationList({
         <Tooltip title="新建对话" placement="right">
           <button
             onClick={handleNew}
-            className="w-11 h-11 rounded-xl gradient-primary flex items-center justify-center text-white hover:opacity-90 transition-opacity cursor-pointer"
+            className="w-11 h-11 flex items-center justify-center text-white hover:opacity-90 transition-opacity cursor-pointer"
+            style={{ background: 'var(--primary)', borderRadius: 'var(--radius-sm)' }}
           >
             <PlusOutlined />
           </button>
@@ -124,11 +125,12 @@ export function ConversationList({
           <Tooltip key={conv.id} title={conv.title} placement="right">
             <button
               onClick={() => handleSelect(conv.id)}
-              className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
+              className={`w-11 h-11 flex items-center justify-center transition-all cursor-pointer ${
                 conv.id === activeId
-                  ? 'gradient-primary text-white'
+                  ? 'text-white'
                   : 'bg-[var(--background)] text-[var(--text-secondary)] hover:bg-[var(--border)]'
               }`}
+              style={conv.id === activeId ? { background: 'var(--primary)', borderRadius: 'var(--radius-sm)' } : { borderRadius: 'var(--radius-sm)' }}
             >
               <MessageOutlined />
             </button>
@@ -145,7 +147,8 @@ export function ConversationList({
       <div className="p-4">
         <button
           onClick={handleNew}
-          className="w-full h-12 rounded-xl gradient-primary text-white font-medium flex items-center justify-center gap-2 hover:opacity-90 transition-opacity cursor-pointer"
+          className="w-full h-12 text-white font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity cursor-pointer"
+          style={{ background: 'var(--primary)', borderRadius: 'var(--radius-sm)' }}
         >
           <PlusOutlined />
           <span>新建对话</span>
@@ -168,11 +171,12 @@ export function ConversationList({
               <div
                 key={conv.id}
                 onClick={() => handleSelect(conv.id)}
-                className={`group p-3 rounded-xl cursor-pointer transition-all ${
+                className={`group p-3 cursor-pointer transition-all ${
                   conv.id === activeId
                     ? 'bg-[var(--primary)] bg-opacity-10'
                     : 'hover:bg-[var(--background)]'
                 }`}
+                style={{ borderRadius: 'var(--radius)' }}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
@@ -196,7 +200,8 @@ export function ConversationList({
                   >
                     <button
                       onClick={(e) => e.stopPropagation()}
-                      className="opacity-0 group-hover:opacity-100 w-8 h-8 rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-red-500 hover:bg-red-50 transition-all cursor-pointer"
+                      className="opacity-0 group-hover:opacity-100 w-8 h-8 flex items-center justify-center text-[var(--text-muted)] hover:text-red-500 hover:bg-red-50 transition-all cursor-pointer"
+                      style={{ borderRadius: 'var(--radius-sm)' }}
                     >
                       <DeleteOutlined />
                     </button>

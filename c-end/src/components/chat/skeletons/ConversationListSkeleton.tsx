@@ -39,7 +39,7 @@ export function ConversationListSkeleton({
           {Array.from({ length: count }).map((_, index) => (
             <div
               key={index}
-              className="p-3 rounded-lg hover:bg-gray-50 transition-colors"
+              className="p-3 rounded-lg hover:bg-[var(--background)] transition-colors"
             >
               <div className="flex items-center justify-between">
                 <Skeleton.Input

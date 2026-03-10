@@ -104,12 +104,17 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // 5. 构建请求体
+    // 5. 构建请求 URL - conversation_id 必须放在 Query 参数中
+    const apiUrl = new URL(COZE_API_URL)
+    if (conversationId) {
+      apiUrl.searchParams.set('conversation_id', conversationId)
+    }
+
+    // 6. 构建请求体
     const cozeRequestBody = {
       bot_id: botId,
       user_id: userId,
       stream: true,
-      conversation_id: conversationId || undefined,
       auto_save_history: true,
       additional_messages: [
         {
@@ -120,8 +125,8 @@ export async function POST(request: NextRequest) {
       ],
     }
 
-    // 6. 调用 Coze API
-    const response = await fetch(COZE_API_URL, {
+    // 7. 调用 Coze API
+    const response = await fetch(apiUrl.toString(), {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${accessToken}`,

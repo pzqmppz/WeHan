@@ -8,29 +8,36 @@ export const metadata: Metadata = {
   description: '武汉高校人才留汉智能服务平台',
 }
 
-// 设计系统配色 (ui-ux-pro-max generated)
+// 设计系统配色 - 年轻活力版
 const designTokens = {
-  // Primary: Sky Blue
-  colorPrimary: '#0369A1',
-  colorPrimaryHover: '#0284C7',
-  colorPrimaryActive: '#0369A1',
-  // Secondary
-  colorInfo: '#0EA5E9',
-  // Success/CTA: Green
-  colorSuccess: '#22C55E',
+  // Primary: 翡翠绿
+  colorPrimary: '#059669',
+  colorPrimaryHover: '#10B981',
+  colorPrimaryActive: '#047857',
+  // Secondary: 深蓝
+  colorInfo: '#1E3A5F',
+  // Success: 绿色
+  colorSuccess: '#059669',
+  // Warning: 橙色
+  colorWarning: '#F97316',
+  // Error: 红色
+  colorError: '#DC2626',
   // Background
   colorBgContainer: '#FFFFFF',
-  colorBgLayout: '#F0F9FF',
+  colorBgLayout: '#FAFAFA',
+  colorBgElevated: '#FFFFFF',
   // Text
-  colorText: '#0C4A6E',
-  colorTextSecondary: '#475569',
-  colorTextTertiary: '#64748B',
+  colorText: '#0A0A0A',
+  colorTextSecondary: '#525252',
+  colorTextTertiary: '#A3A3A3',
+  colorTextQuaternary: '#D4D4D4',
   // Border
-  colorBorder: '#E2E8F0',
-  // Border Radius
-  borderRadius: 12,
-  borderRadiusLG: 16,
-  borderRadiusSM: 8,
+  colorBorder: '#E5E5E5',
+  colorBorderSecondary: '#F5F5F5',
+  // Border Radius - 减少圆角
+  borderRadius: 8,
+  borderRadiusLG: 12,
+  borderRadiusSM: 4,
 }
 
 export default function RootLayout({

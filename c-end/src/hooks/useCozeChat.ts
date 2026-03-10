@@ -73,11 +73,29 @@ export function useCozeChat(options: UseCozeChatOptions = {}): UseCozeChatReturn
   const handleSSEEvent = useCallback(
     (event: string, data: string) => {
       switch (event) {
-        case CozeEventType.CONVERSATION_CREATED: {
-          const parsed = parseSSEData<{ id: string }>(data)
-          if (parsed?.id) {
-            setConversationId(parsed.id)
+        case CozeEventType.CHAT_CREATED: {
+          const parsed = parseSSEData<{ id: string; conversation_id: string }>(data)
+          if (parsed?.conversation_id) {
+            setConversationId(parsed.conversation_id)
           }
+          break
+        }
+
+        case CozeEventType.CHAT_IN_PROGRESS: {
+          // 聊天进行中，此时可能还没有内容，但可以将状态设为 streaming
+          updateLastMessage({
+            status: 'streaming',
+          })
+          break
+        }
+
+        case CozeEventType.CHAT_COMPLETED: {
+          // 聊天完成，忽略
+          break
+        }
+
+        case CozeEventType.DONE: {
+          // 流结束，忽略
           break
         }
 
@@ -88,6 +106,11 @@ export function useCozeChat(options: UseCozeChatOptions = {}): UseCozeChatReturn
             lastMessageRef.current += parsed.content
             updateLastMessage({
               content: lastMessageRef.current,
+              status: 'streaming',
+            })
+          } else {
+            // 有 MESSAGE_DELTA 事件但没有 content，也要确保状态是 streaming
+            updateLastMessage({
               status: 'streaming',
             })
           }
@@ -119,6 +142,11 @@ export function useCozeChat(options: UseCozeChatOptions = {}): UseCozeChatReturn
 
         case CozeEventType.PING: {
           // 心跳，忽略
+          break
+        }
+
+        default: {
+          // 未知事件类型，忽略
           break
         }
       }

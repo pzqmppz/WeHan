@@ -43,7 +43,7 @@ export function InterviewPanel() {
         <div>
           <p>当前进度：{progress.current}/{progress.total} 题</p>
           <p>已用时间：{formatDuration(elapsed)}</p>
-          <p className="text-gray-400 mt-2">结束后将生成评估报告</p>
+          <p className="text-[var(--text-muted)] mt-2">结束后将生成评估报告</p>
         </div>
       ),
       okText: '确认结束',
@@ -74,9 +74,9 @@ export function InterviewPanel() {
   // 面试已完成
   if (session.status === 'completed') {
     return (
-      <Card className="bg-green-50 border-green-200">
+      <Card className="bg-[var(--success-bg)]">
         <div className="text-center">
-          <Text className="text-green-600 text-lg font-medium">面试已完成</Text>
+          <Text className="text-[var(--success)] text-lg font-medium">面试已完成</Text>
           <Divider className="my-3" />
           <Space direction="vertical" size="small">
             <Text type="secondary">
@@ -99,14 +99,14 @@ export function InterviewPanel() {
       {/* 顶部状态栏 */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium">
+          <span className="px-2 py-1 rounded text-xs font-medium" style={{ background: 'var(--primary-bg)', color: 'var(--primary)' }}>
             面试进行中
           </span>
           <Text type="secondary" className="text-sm">
             {session.jobTitle}
           </Text>
         </div>
-        <div className="flex items-center gap-1 text-gray-600">
+        <div className="flex items-center gap-1 text-[var(--text-secondary)]">
           <ClockCircleOutlined />
           <Text className="font-mono text-lg">{formattedTime}</Text>
         </div>
@@ -123,7 +123,7 @@ export function InterviewPanel() {
 
       {/* 当前问题 */}
       {currentQuestion && (
-        <div className="p-3 bg-gray-50 rounded-lg mb-4">
+        <div className="p-3 bg-[var(--background)] rounded-lg mb-4">
           <div className="flex items-center gap-2 mb-2">
             <Text strong>第 {progress.current} 题</Text>
             {currentQuestion.category && (
@@ -132,7 +132,7 @@ export function InterviewPanel() {
               </Text>
             )}
           </div>
-          <Paragraph className="text-gray-700 mb-0">
+          <Paragraph className="text-[var(--text-secondary)] mb-0">
             {currentQuestion.question}
           </Paragraph>
         </div>

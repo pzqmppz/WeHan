@@ -66,13 +66,13 @@ export function JobCard({
         onClick={handleSend}
       >
         <div className="flex-1 min-w-0">
-          <h4 className="text-sm font-medium text-gray-800 truncate">{job.title}</h4>
-          <p className="text-xs text-gray-500 truncate">
+          <h4 className="text-sm font-medium text-[var(--text-primary)] truncate">{job.title}</h4>
+          <p className="text-xs text-[var(--text-muted)] truncate">
             {job.enterprise?.name} · {job.location}
           </p>
         </div>
         <div className="flex items-center gap-2 ml-2">
-          <span className="text-sm font-medium text-blue-600">
+          <span className="text-sm font-medium text-[var(--primary)]">
             {formatSalary(job.salaryMin, job.salaryMax)}
           </span>
           {applied && <CheckCircleOutlined className="text-green-500" />}
@@ -89,7 +89,7 @@ export function JobCard({
     >
       {/* 标题行 */}
       <div className="flex items-start justify-between mb-2">
-        <h3 className="text-base font-semibold text-gray-800 line-clamp-1">{job.title}</h3>
+        <h3 className="text-base font-semibold text-[var(--text-primary)] line-clamp-1">{job.title}</h3>
         <Tooltip title={isFavorited ? '取消收藏' : '收藏'}>
           <Button
             type="text"
@@ -102,16 +102,16 @@ export function JobCard({
       </div>
 
       {/* 公司信息 */}
-      <p className="text-sm text-gray-600 mb-2">{job.enterprise?.name || '匿名公司'}</p>
+      <p className="text-sm text-[var(--text-secondary)] mb-2">{job.enterprise?.name || '匿名公司'}</p>
 
       {/* 薪资和地点 */}
       <div className="flex items-center gap-4 mb-3 text-sm">
-        <span className="font-medium text-blue-600">
+        <span className="font-medium text-[var(--primary)]">
           <DollarOutlined className="mr-1" />
           {formatSalary(job.salaryMin, job.salaryMax)}
         </span>
         {job.location && (
-          <span className="text-gray-500">
+          <span className="text-[var(--text-muted)]">
             <EnvironmentOutlined className="mr-1" />
             {job.location}
           </span>
@@ -127,7 +127,7 @@ export function JobCard({
             </Tag>
           ))}
           {job.skills.length > 4 && (
-            <Tag className="text-xs text-gray-400">+{job.skills.length - 4}</Tag>
+            <Tag className="text-xs text-[var(--text-muted)]">+{job.skills.length - 4}</Tag>
           )}
         </div>
       )}

@@ -124,12 +124,18 @@ export const CozeEventType = {
   MESSAGE_DELTA: 'conversation.message.delta',
   // 消息完成
   MESSAGE_COMPLETED: 'conversation.message.completed',
-  // 会话创建
-  CONVERSATION_CREATED: 'conversation.created',
+  // 聊天创建（会话创建）
+  CHAT_CREATED: 'conversation.chat.created',
+  // 聊天进行中
+  CHAT_IN_PROGRESS: 'conversation.chat.in_progress',
+  // 聊天完成
+  CHAT_COMPLETED: 'conversation.chat.completed',
   // 错误
   ERROR: 'error',
   // 心跳
   PING: 'ping',
+  // 流结束
+  DONE: 'done',
 } as const
 
 export type CozeEventTypeValue = (typeof CozeEventType)[keyof typeof CozeEventType]

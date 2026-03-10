@@ -95,7 +95,8 @@ export function LoadingIndicator({
             {[0, 1, 2].map((i) => (
               <span
                 key={i}
-                className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                className="w-2 h-2 rounded-full animate-bounce"
+                style={{ background: 'var(--primary)' }}
                 style={{
                   animationDelay: `${i * 0.15}s`,
                   animationDuration: '0.6s',

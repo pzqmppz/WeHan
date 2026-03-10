@@ -145,13 +145,13 @@ export function ResumeUpload({
     switch (status) {
       case 'uploading':
       case 'parsing':
-        return <LoadingOutlined className="text-4xl text-blue-500 animate-spin" />
+        return <LoadingOutlined className="text-4xl text-[var(--primary)] animate-spin" />
       case 'success':
         return <CheckCircleOutlined className="text-4xl text-green-500" />
       case 'error':
         return <CloseCircleOutlined className="text-4xl text-red-500" />
       default:
-        return <InboxOutlined className="text-4xl text-gray-400" />
+        return <InboxOutlined className="text-4xl text-[var(--text-muted)]" />
     }
   }
 
@@ -159,10 +159,10 @@ export function ResumeUpload({
   if (!file || status === 'idle') {
     return (
       <div className={className}>
-        <Dragger {...uploadProps} className="bg-gray-50">
+        <Dragger {...uploadProps} className="bg-[var(--background)]">
           <p className="ant-upload-drag-icon">{renderStatusIcon()}</p>
           <p className="ant-upload-text">点击或拖拽文件到此区域上传</p>
-          <p className="ant-upload-hint text-gray-400">
+          <p className="ant-upload-hint text-[var(--text-muted)]">
             支持 {allowedTypes.join(', ').toUpperCase()} 格式，最大 {maxSizeMB}MB
           </p>
         </Dragger>
@@ -177,10 +177,10 @@ export function ResumeUpload({
       {/* 文件信息 */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <FileTextOutlined className="text-xl text-blue-500" />
+          <FileTextOutlined className="text-xl text-[var(--primary)]" />
           <div>
-            <p className="text-sm font-medium text-gray-800">{file.name}</p>
-            <p className="text-xs text-gray-400">{formatFileSize(file.size)}</p>
+            <p className="text-sm font-medium text-[var(--text-primary)]">{file.name}</p>
+            <p className="text-xs text-[var(--text-muted)]">{formatFileSize(file.size)}</p>
           </div>
         </div>
         <Button
@@ -199,7 +199,7 @@ export function ResumeUpload({
 
       {/* 状态提示 */}
       {status === 'parsing' && (
-        <p className="text-sm text-blue-500">
+        <p className="text-sm text-[var(--primary)]">
           <LoadingOutlined className="mr-1" />
           正在解析简历...
         </p>
