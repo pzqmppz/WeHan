@@ -99,8 +99,8 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* 右侧快捷入口 - iPad 和桌面端 */}
-          <aside className="hidden md:flex w-64 flex-shrink-0 flex-col gap-4 p-4 bg-white border-l border-[var(--border)]">
+          {/* 右侧快捷入口 - 已隐藏，统一使用移动端体验 */}
+          <aside className="hidden w-64 flex-shrink-0 flex-col gap-4 p-4 bg-white border-l border-[var(--border)]">
             <h3 className="text-sm font-semibold text-[var(--text-secondary)] px-1 uppercase tracking-wide">快捷入口</h3>
 
             {/* 主要入口 - 模拟面试 */}
