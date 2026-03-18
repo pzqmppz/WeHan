@@ -6,15 +6,20 @@
 'use client'
 
 import { useCallback } from 'react'
-import { Tooltip } from 'antd'
+import Link from 'next/link'
+import { Tooltip, Dropdown, Avatar } from 'antd'
+import type { MenuProps } from 'antd'
 import {
   ClearOutlined,
   BulbOutlined,
   RocketOutlined,
   BookOutlined,
+  UserOutlined,
+  LogoutOutlined,
 } from '@ant-design/icons'
 import { ChatContainer } from '@/components/chat/ChatContainer'
 import { useChatStore } from '@/stores/chatStore'
+import { useAuth } from '@/hooks/useAuth'
 
 // 快捷入口配置 - 更新为年轻活力配色
 const quickActions = [
@@ -48,11 +53,27 @@ export default function HomePage() {
   const setConversationId = useChatStore((s) => s.setConversationId)
   const messages = useChatStore((s) => s.messages)
 
+  // 认证状态
+  const { user, isAuthenticated, logout } = useAuth()
+
   // 清空对话记录
   const handleClearHistory = useCallback(() => {
     clearMessages()
     setConversationId(null)
   }, [clearMessages, setConversationId])
+
+  // 用户菜单项（个人资料功能暂时隐藏，后续升级为简历管理）
+  const userMenuItems: MenuProps['items'] = [
+    {
+      key: 'logout',
+      icon: <LogoutOutlined />,
+      label: '退出登录',
+      onClick: () => {
+        logout()
+      },
+      danger: true,
+    },
+  ]
 
   return (
     <main className="h-screen flex" style={{ background: 'var(--background)' }}>
@@ -70,8 +91,9 @@ export default function HomePage() {
             </h1>
           </div>
 
-          {/* 右侧操作区 - 清空记录按钮 */}
-          <div className="flex items-center gap-2">
+          {/* 右侧操作区 */}
+          <div className="flex items-center gap-3">
+            {/* 清空记录按钮 */}
             {messages.length > 0 && (
               <Tooltip title="清空记录">
                 <button
@@ -83,6 +105,36 @@ export default function HomePage() {
                   <span className="hidden sm:inline">清空记录</span>
                 </button>
               </Tooltip>
+            )}
+
+            {/* 登录/用户菜单 */}
+            {isAuthenticated && user ? (
+              // 已登录：显示用户菜单
+              <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" trigger={['click']}>
+                <div className="flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg hover:bg-[var(--background)] transition-colors">
+                  <Avatar
+                    size={32}
+                    src={user.avatar}
+                    style={{ backgroundColor: 'var(--primary)' }}
+                  >
+                    {user.name?.[0] || <UserOutlined />}
+                  </Avatar>
+                  <span className="hidden sm:inline text-sm font-medium text-[var(--text-primary)]">
+                    {user.name}
+                  </span>
+                </div>
+              </Dropdown>
+            ) : (
+              // 未登录：显示登录按钮
+              <Link href="/login">
+                <button
+                  className="h-10 px-5 text-white font-medium flex items-center gap-2 hover:opacity-90 transition-opacity cursor-pointer"
+                  style={{ background: 'var(--primary)', borderRadius: 'var(--radius-sm)' }}
+                >
+                  <UserOutlined />
+                  <span>登录</span>
+                </button>
+              </Link>
             )}
           </div>
         </header>

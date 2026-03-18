@@ -25,7 +25,9 @@ web/error_log*.md
 # Local env files
 .env
 .env*.local
+.env.production
 web/.env
+c-end/.env*
 next-env.d.ts
 
 # Vercel
@@ -43,3 +45,6 @@ web/src/generated/
 
 # IDE
 .vscode/
+
+# Duplicate/temp folders
+c-end/c-end/

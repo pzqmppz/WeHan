@@ -59,7 +59,7 @@
           "inputs": {
             "apiInfo": {
               "method": "GET",
-              "url": "http://111.231.51.9/api/open/jobs/{{block_output_100001.job_id}}"
+              "url": "https://web.dolosy.cn/api/open/jobs/{{block_output_100001.job_id}}"
             },
             "body": {
               "bodyType": "EMPTY",
@@ -413,7 +413,7 @@
           "inputs": {
             "apiInfo": {
               "method": "POST",
-              "url": "http://111.231.51.9/api/open/interviews"
+              "url": "https://web.dolosy.cn/api/open/interviews"
             },
             "body": {
               "bodyType": "JSON",

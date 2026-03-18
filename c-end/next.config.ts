@@ -27,6 +27,29 @@ const nextConfig: NextConfig = {
 
   // powered-by 头
   poweredByHeader: false,
+
+  // 禁用缓存，确保每次请求都获取最新内容
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+          },
+          {
+            key: 'Pragma',
+            value: 'no-cache',
+          },
+          {
+            key: 'Expires',
+            value: '0',
+          },
+        ],
+      },
+    ]
+  },
 }
 
 // Bundle 分析（仅在 ANALYZE=true 时启用）

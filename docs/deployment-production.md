@@ -66,14 +66,14 @@ ssh root@<服务器IP>
 
 ## 二、域名配置
 
-| 域名 | 用途 | 端口 | 状态 |
-|------|------|------|------|
-| `wehan.dolosy.cn` | C 端落地页 | 8080 | 待备案 |
-| `rcjc.dolosy.cn` | B 端管理后台 | 9000 | 待备案 |
+| 域名 | 用途 | 状态 |
+|------|------|------|
+| `wehan.dolosy.cn` | C 端 WeHan 求职助手 | 已配置 HTTPS |
+| `web.dolosy.cn` | B 端才聚江城管理后台 | 已配置 HTTPS |
 
-**临时访问地址**：
-- C 端：http://111.231.51.9:8080
-- B 端：http://111.231.51.9:9000
+**正式访问地址**：
+- C 端：https://wehan.dolosy.cn
+- B 端：https://web.dolosy.cn
 
 ---
 
@@ -89,19 +89,28 @@ ssh root@<服务器IP>
 ### 3.2 PM2 进程
 
 ```
-┌────┬──────────┬─────────┬────────┬──────────┐
-│ id │ name     │ status  │ uptime │ memory   │
-├────┼──────────┼─────────┼────────┼──────────┤
-│ 0  │ wehan    │ online  │ 21h+   │ ~74MB    │
-└────┴──────────┴─────────┴────────┴──────────┘
+┌────┬─────────────────┬─────────┬────────┬──────────┬────────┐
+│ id │ name            │ status  │ uptime │ memory   │ port   │
+├────┼─────────────────┼─────────┼────────┼──────────┼────────┤
+│ 0  │ wehan           │ online  │ -      │ ~52MB    │ 3000   │
+│ 7  │ wehan-c-end     │ online  │ -      │ ~89MB    │ 8080   │
+│ 6  │ video-downloader│ online  │ -      │ ~50MB    │ 3008   │
+└────┴─────────────────┴─────────┴────────┴──────────┴────────┘
 ```
+
+**服务说明**：
+- `wehan` - B 端 Next.js 应用 (才聚江城管理后台)
+- `wehan-c-end` - C 端 Next.js 应用 (WeHan 求职助手)
+- `video-downloader` - 视频下载服务
 
 **常用命令**：
 ```bash
 pm2 list              # 查看进程列表
-pm2 restart wehan     # 重启应用
+pm2 restart wehan     # 重启 B 端
+pm2 restart wehan-c-end   # 重启 C 端
 pm2 logs wehan        # 查看日志
 pm2 monit             # 监控面板
+pm2 save              # 保存进程列表
 ```
 
 ### 3.3 PostgreSQL
@@ -191,25 +200,34 @@ cat /www/wwwroot/WeHan/web/.env
 # 1. SSH 登录服务器
 ssh wehan
 
-# 2. 进入项目目录
-cd /www/wwwroot/WeHan/web
+# 2. 进入项目目录（B 端或 C 端）
+cd /www/wwwroot/WeHan/web          # B 端
+# 或
+cd /www/wwwroot/WeHan/c-end        # C 端
 
 # 3. 拉取最新代码
 git pull origin master
 
-# 4. 安装依赖
+# 4. 安装依赖（如有更新）
 npm install
 
-# 5. 数据库迁移（如有）
+# 5. 数据库迁移（仅 B 端需要）
 npx prisma generate
 npx prisma db push
 
-# 6. 构建应用
+# 6. 清除 Next.js 缓存并构建
+rm -rf .next
 npm run build
 
 # 7. 重启 PM2
-pm2 restart wehan
+pm2 restart wehan           # B 端
+# 或
+pm2 restart wehan-c-end     # C 端
 ```
+
+**重要提示**：
+- 每次构建前必须执行 `rm -rf .next` 清除缓存，否则可能导致更新不生效
+- Next.js 配置了禁用缓存的响应头，但 `.next` 目录中的静态页面仍需清除重建
 
 ---
 
@@ -361,5 +379,63 @@ cat /www/wwwroot/WeHan/web/logs/cleanup.log
 
 ---
 
-*文档版本: 1.2 | 更新时间: 2026-03-04 | 维护者: WeHan 开发团队*
-*变更: 新增数据清理功能章节*
+## 十一、Next.js 缓存配置
+
+### 11.1 禁用缓存响应头
+
+为解决部署后更新不生效的问题，两个项目的 `next.config.ts` 已添加禁用缓存的响应头配置：
+
+```typescript
+async headers() {
+  return [
+    {
+      source: '/:path*',
+      headers: [
+        {
+          key: 'Cache-Control',
+          value: 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+        },
+        {
+          key: 'Pragma',
+          value: 'no-cache',
+        },
+        {
+          key: 'Expires',
+          value: '0',
+        },
+      ],
+    },
+  ]
+}
+```
+
+**效果**：
+- 每次请求都会返回最新的内容
+- 避免浏览器和代理服务器缓存旧页面
+
+### 11.2 Favicon 图标
+
+**图标文件**：
+- `c-end/public/favicon.ico` - C 端图标
+- `web/public/favicon.ico` - B 端图标
+- 源文件：`icon.png` (1.6MB)
+
+**更新图标后**：
+1. 将新图标复制到 `public/favicon.ico`
+2. 清除 `.next` 缓存：`rm -rf .next`
+3. 重新构建：`npm run build`
+4. 重启服务：`pm2 restart wehan` 或 `pm2 restart wehan-c-end`
+5. 浏览器硬刷新：`Ctrl + Shift + R`
+
+### 11.3 移动端适配
+
+**C 端页面布局**：
+- 右侧快捷入口已隐藏（`className="hidden w-64"`）
+- 统一使用移动端体验，所有屏幕尺寸显示相同布局
+
+**配置文件**：`c-end/src/app/page.tsx` 第 103 行
+
+---
+
+*文档版本: 1.3 | 更新时间: 2026-03-12 | 维护者: WeHan 开发团队*
+*变更: 新增 Next.js 缓存配置章节、更新 PM2 进程信息、优化部署流程*

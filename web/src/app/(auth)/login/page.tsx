@@ -185,11 +185,6 @@ function LoginForm() {
         </Form.Item>
       </Form>
 
-      <div className="text-center text-sm mt-4">
-        <Text type="secondary" className="text-gray-500">
-          测试账号: admin@wehan.com / admin123
-        </Text>
-      </div>
     </Card>
   )
 }
